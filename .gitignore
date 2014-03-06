@@ -1,0 +1,31 @@
+# Object files
+*.o
+*.ko
+*.d
+
+# Libraries
+*.lib
+*.a
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+*.gch
+
+# Executables
+initfs
+fsaccess
+*.exe
+*.out
+*.app
+
+jun*
+out*
+*~
+*.swp
+*.swo
+*.orig
+*.sublime-project
+*.sublime-workspace
