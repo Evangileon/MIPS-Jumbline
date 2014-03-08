@@ -3,7 +3,10 @@
 
 #include "common.h"
 
-typedef int (*InputMethod)(char);
+typedef int (*ExchangeMethod)(char);
+
+#define MARKTWO '1'
+#define MARKINSERT '2'
 
 char buffer[16];
 int numChars = 6;
@@ -76,18 +79,56 @@ int markInsert(char input) {
 	return 0;
     }
 
+    char tmp;
     int i;
-    for (i = mark; i < mark2; i++) {
-	
+    if(mark < mark2) {
+	for (i = mark; i < mark2 - 1; i++) {
+	    tmp = buffer[i];
+	    buffer[i] = buffer[i + 1];
+	    buffer[i + 1] = buffer[i];
+	}
+    } else {
+	for (i = mark; i > mark2; i--) {
+	    tmp = buffer[i];
+	    buffer[i] = buffer[i - 1];
+	    buffer[i - 1] = tmp;
+	}
     }
-
     
     mark = -1;
     mark2 = -1;
     return 0;
 }
 
-InputMethod inputFunc = markTwo;
+ExchangeMethod exchangeFunc = markTwo;
+
+int chooseExchangeMethod(int method) {
+
+    int ret = getchar();
+    if(EOF == ret) {
+	return -1;
+    }
+
+    char cmd = (char)ret;
+    if('1' > cmd || '9' < cmd) {
+	INFO("%d unsupported\n", ret);
+	return -1;
+    }
+    
+    switch (method) {
+    case MARKTWO:
+	exchangeFunc = &markTwo;
+	break;
+    case MARKINSERT:
+	exchangeFunc = &markInsert;
+	break;
+    default:
+	
+    }
+
+    return 0;
+}
+
 
 int rearrange(char* str, int n) {
     //printf("This is a line need to be erased\n");
@@ -116,7 +157,7 @@ int rearrange(char* str, int n) {
 	cmd = (char)intCmd;
 
 	if('0' <= cmd && '9' >= cmd) {
-	    inputFunc(cmd);
+	    exchangeFunc(cmd);
 	    continue;
 	}
 
@@ -130,8 +171,11 @@ int rearrange(char* str, int n) {
 	case 'g':
 	    
 	    break;
-	case 'm':
-	    
+	case 'm': /*choose exchange method*/
+	    chooseExchangeMethod(0);
+	    break;
+	case 'x': /*exit*/
+	    return 0;
 	    break;
 	}
 
