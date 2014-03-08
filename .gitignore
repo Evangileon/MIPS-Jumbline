@@ -2,6 +2,7 @@
 *.o
 *.ko
 *.d
+*.s
 
 # Libraries
 *.lib
@@ -21,6 +22,7 @@ fsaccess
 *.out
 *.app
 
+tags
 jun*
 out*
 *~
