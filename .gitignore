@@ -16,7 +16,7 @@
 *.gch
 
 # Executables
-initfs
+rearrange
 fsaccess
 *.exe
 *.out
