@@ -14,6 +14,11 @@ int numChars = 6;
 int mark = -1;
 int mark2 = -1;
 
+void clearStdinBuf() {
+    int c;
+    while((c = getchar()) != '\n' && c != EOF);
+}
+
 
 // compare the buffer with dictionary
 int compare() {
@@ -44,8 +49,8 @@ int exchange(int first, int second) {
 // mark the two chars to be exchanged
 int markTwo(char input) {
      int tmpMark = input - '0';
-     if(tmpMark == mark) { // if same, cancel first mark
-	 mark = -1;
+     if(-1 != mark && tmpMark == mark) { // if same, cancel first mark
+	 clearInput();
 	 return 0;
      }
 
@@ -57,8 +62,7 @@ int markTwo(char input) {
      mark2 = tmpMark;
      	    
      int ret = exchange(mark, mark2);
-     mark = -1;
-     mark2 = -1;
+     clearInput();
      if(0 == ret) {
 	 INFO("Invalid input for exchanging\n");
      }
@@ -69,8 +73,8 @@ int markTwo(char input) {
 // mark one char, then insert to the position before the numeric input
 int markInsert(char input) {
     int tmpMark = input - '0';
-    if(tmpMark == mark) { // if same, cancel first mark
-	mark = -1;
+    if(-1 != mark && tmpMark == mark) { // if same, cancel first mark
+	clearInput();
 	return 0;
     } 
 
@@ -79,24 +83,26 @@ int markInsert(char input) {
 	return 0;
     }
 
+    mark2 = tmpMark;
     char tmp;
     int i;
     if(mark < mark2) {
 	for (i = mark; i < mark2 - 1; i++) {
-	    tmp = buffer[i];
-	    buffer[i] = buffer[i + 1];
-	    buffer[i + 1] = buffer[i];
+	    //tmp = buffer[i];
+	    //buffer[i] = buffer[i + 1];
+	    //buffer[i + 1] = buffer[i];
+	    exchange(i, i + 1);
 	}
     } else {
 	for (i = mark; i > mark2; i--) {
-	    tmp = buffer[i];
-	    buffer[i] = buffer[i - 1];
-	    buffer[i - 1] = tmp;
+	    //tmp = buffer[i];
+	    //buffer[i] = buffer[i - 1];
+	    //buffer[i - 1] = tmp;
+	    exchange(i, i - 1);
 	}
     }
     
-    mark = -1;
-    mark2 = -1;
+    clearInput();
     return 0;
 }
 
@@ -104,18 +110,29 @@ ExchangeMethod exchangeFunc = markTwo;
 
 int chooseExchangeMethod(int method) {
 
-    int ret = getchar();
-    if(EOF == ret) {
+    clearInput();
+    char cmdBuf[16];
+
+    printf("Select the method:\n");
+    printf("1 to markTwo\n");
+    printf("2 to markInsert\n");
+    
+    fgets(cmdBuf, 2, stdin);
+    clearStdinBuf();
+
+    if(0 == strlen(cmdBuf)) {
+	INFO("No input\n");
 	return -1;
     }
 
-    char cmd = (char)ret;
+    char cmd = (char)cmdBuf[0];
+    printf("Choose %c\n", cmd);
     if('1' > cmd || '9' < cmd) {
-	INFO("%d unsupported\n", ret);
+	INFO("%c unsupported\n", cmd);
 	return -1;
     }
     
-    switch (method) {
+    switch (cmd) {
     case MARKTWO:
 	exchangeFunc = &markTwo;
 	break;
@@ -123,12 +140,12 @@ int chooseExchangeMethod(int method) {
 	exchangeFunc = &markInsert;
 	break;
     default:
-	
+	exchangeFunc = &markTwo;
+	return -1;
     }
 
     return 0;
 }
-
 
 int rearrange(char* str, int n) {
     //printf("This is a line need to be erased\n");
@@ -140,6 +157,7 @@ int rearrange(char* str, int n) {
 
     char cmd = -1;
     int intCmd = -1;
+    char cmdBuf[16];
 
     if(7 < n || 3 > n) {
 	ERROR("Invalid string length\n");
@@ -149,13 +167,25 @@ int rearrange(char* str, int n) {
     strncpy(buffer, str, n);
     
     while (1) {
-	intCmd = getchar();
-	if(EOF == intCmd) {
+
+	if(-1 == mark) {
+	    printf("\n");
+	    printf("Input the index of the char you want to exchange\n");
+	    fwrite(buffer, sizeof(char), n, stdout);
+	    printf("\nOr choose option:\n");
+	    printf("x to exit the program\n");
+	    printf("m to choose exchange method\n");
+	    printf("c to compare the string with list\n");
+	}
+	
+	fgets(cmdBuf, 2 ,stdin);
+	clearStdinBuf();
+	if(0 == strlen(cmdBuf)) {
 	    ERROR("Internal error, read an invalid char from input\n");
 	}
 
-	cmd = (char)intCmd;
-
+	cmd = (char)cmdBuf[0];
+	printf("Input: %c\n", cmd);
 	if('0' <= cmd && '9' >= cmd) {
 	    exchangeFunc(cmd);
 	    continue;
@@ -168,8 +198,8 @@ int rearrange(char* str, int n) {
 	case 'e': /*exit*/
 	    return 1;
 	    break;
-	case 'g':
-	    
+	case '\n':
+	    printf("newline");
 	    break;
 	case 'm': /*choose exchange method*/
 	    chooseExchangeMethod(0);
@@ -199,3 +229,5 @@ int main(int argc, char** argv) {
 
 	return 0;
 }
+
+
