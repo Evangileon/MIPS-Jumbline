@@ -3,16 +3,16 @@
 
 #include "common.h"
 
-typedef int (*ExchangeMethod)(char);
+typedef int (*ExchangeMethod)(int* mark, int cmd);
 
-#define MARKTWO '1'
-#define MARKINSERT '2'
+#define MARKTWO ((int)'1')
+#define MARKINSERT ((int)'2')
 
-char buffer[16];
-int numChars = 6;
+static char buffer[16];
+static int numChars = 7;
 
-int mark = -1;
-int mark2 = -1;
+//int mark = -1;
+//int mark2 = -1;
 
 void clearStdinBuf() {
     int c;
@@ -26,11 +26,25 @@ int compare() {
 }
 
 // clear inout status
-int clearInput() {
-    mark = -1;
-    mark2 = -1;
+void clearInput(int* mark) {
+    *mark = -1;
+}
 
-    return 1;
+int getInput() {
+    int cmd = -1;
+    char cmdBuf[4];
+
+    //clearInput();
+    fgets(cmdBuf, 2, stdin);
+    clearStdinBuf();
+
+    if(0 == strlen(cmdBuf)) {
+	INFO("No input\n");
+	return -1;
+    }
+
+    cmd = (int)cmdBuf[0];
+    return cmd;
 }
 
 // echange the char between first and second chars
@@ -47,22 +61,20 @@ int exchange(int first, int second) {
 }
 
 // mark the two chars to be exchanged
-int markTwo(char input) {
+int markTwo(int* mark, int input) {
      int tmpMark = input - '0';
-     if(-1 != mark && tmpMark == mark) { // if same, cancel first mark
-	 clearInput();
+     if(-1 != *mark && tmpMark == *mark) { // if same, cancel first mark
+	 clearInput(mark);
 	 return 0;
      }
 
-     if(-1 == mark) { // first char from unmark to mark
-	 mark = tmpMark;
+     if(-1 == *mark) { // first char from unmark to mark
+	 *mark = tmpMark;
 	 return 0;
      }
-     // second
-     mark2 = tmpMark;
      	    
-     int ret = exchange(mark, mark2);
-     clearInput();
+     int ret = exchange(*mark, tmpMark);
+     clearInput(mark);
      if(0 == ret) {
 	 INFO("Invalid input for exchanging\n");
      }
@@ -70,39 +82,33 @@ int markTwo(char input) {
     return 0;
 }
 
+// int* is both the state flag and marked index
 // mark one char, then insert to the position before the numeric input
-int markInsert(char input) {
+int markInsert(int* mark, int input) {
     int tmpMark = input - '0';
-    if(-1 != mark && tmpMark == mark) { // if same, cancel first mark
-	clearInput();
+    if(-1 != *mark && tmpMark == *mark) { // if same, cancel first mark
+	clearInput(mark);
 	return 0;
     } 
 
-    if(-1 == mark) {
-	mark = tmpMark;
+    if(-1 == *mark) {
+	*mark = tmpMark;
 	return 0;
     }
 
-    mark2 = tmpMark;
     char tmp;
     int i;
-    if(mark < mark2) {
-	for (i = mark; i < mark2 - 1; i++) {
-	    //tmp = buffer[i];
-	    //buffer[i] = buffer[i + 1];
-	    //buffer[i + 1] = buffer[i];
+    if(*mark < tmpMark) {
+	for (i = *mark; i < tmpMark - 1; i++) {
 	    exchange(i, i + 1);
 	}
     } else {
-	for (i = mark; i > mark2; i--) {
-	    //tmp = buffer[i];
-	    //buffer[i] = buffer[i - 1];
-	    //buffer[i - 1] = tmp;
+	for (i = *mark; i > tmpMark; i--) {
 	    exchange(i, i - 1);
 	}
     }
     
-    clearInput();
+    clearInput(mark);
     return 0;
 }
 
@@ -110,25 +116,15 @@ ExchangeMethod exchangeFunc = markTwo;
 
 int chooseExchangeMethod(int method) {
 
-    clearInput();
-    char cmdBuf[16];
-
     printf("Select the method:\n");
     printf("1 to markTwo\n");
     printf("2 to markInsert\n");
     
-    fgets(cmdBuf, 2, stdin);
-    clearStdinBuf();
-
-    if(0 == strlen(cmdBuf)) {
-	INFO("No input\n");
-	return -1;
-    }
-
-    char cmd = (char)cmdBuf[0];
-    printf("Choose %c\n", cmd);
+    int cmd = getInput();
+    
+    printf("Choose %c\n", (char)cmd);
     if('1' > cmd || '9' < cmd) {
-	INFO("%c unsupported\n", cmd);
+	INFO("%c unsupported\n", (char)cmd);
 	return -1;
     }
     
@@ -155,16 +151,17 @@ int rearrange(char* str, int n) {
 	//printf("After overwritting\n");	
 	//printf("%s\n",str);	
 
-    char cmd = -1;
+    int cmd = -1;
     int intCmd = -1;
-    char cmdBuf[16];
-
+    //char cmdBuf[16];
+    int mark = -1;
+    
     if(7 < n || 3 > n) {
 	ERROR("Invalid string length\n");
     }
 
-    memset(buffer, 0, sizeof(buffer));
-    strncpy(buffer, str, n);
+    //memset(buffer, 0, sizeof(buffer));
+    //strncpy(buffer, str, n);
     
     while (1) {
 
@@ -177,36 +174,42 @@ int rearrange(char* str, int n) {
 	    printf("m to choose exchange method\n");
 	    printf("c to compare the string with list\n");
 	}
-	
+	printf("\n");
+	printf("\t\t%s\n", buffer);
+	printf("\n");
+/*
 	fgets(cmdBuf, 2 ,stdin);
 	clearStdinBuf();
 	if(0 == strlen(cmdBuf)) {
 	    ERROR("Internal error, read an invalid char from input\n");
 	}
+	*/
 
-	cmd = (char)cmdBuf[0];
-	printf("Input: %c\n", cmd);
+	int cmd = getInput();
+	printf("Input: %c\n", (char)cmd);
 	if('0' <= cmd && '9' >= cmd) {
-	    exchangeFunc(cmd);
+	    exchangeFunc(&mark, cmd);
 	    continue;
 	}
 
 	switch (cmd) {
-	case 'c': /*commit to compare*/
+	case (int)'c': /*commit to compare*/
 	    compare();
 	    break;
-	case 'e': /*exit*/
+	case (int)'e': /*exit*/
 	    return 1;
 	    break;
-	case '\n':
+	case (int)'\n':
 	    printf("newline");
 	    break;
-	case 'm': /*choose exchange method*/
+	case (int)'m': /*choose exchange method*/
 	    chooseExchangeMethod(0);
 	    break;
-	case 'x': /*exit*/
+	case (int)'x': /*exit*/
 	    return 0;
 	    break;
+	default:
+	    printf("Invalid input\n");
 	}
 
     }
@@ -222,8 +225,9 @@ int main(int argc, char** argv) {
 	}	
 
 	char *str = argv[1];
-	int n = strlen(str) - 1;
-	n++;
+	int n = strlen(str);
+	numChars = n;
+	strncpy(buffer, str, n);
 
 	rearrange(str,n);	
 
