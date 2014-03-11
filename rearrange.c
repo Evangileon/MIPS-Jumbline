@@ -25,10 +25,12 @@ int compare() {
     return 1;
 }
 
+/*
 // clear inout status
 void clearInput(int* mark) {
     *mark = -1;
 }
+*/
 
 int getInput() {
     int cmd = -1;
@@ -37,22 +39,23 @@ int getInput() {
     //clearInput();
     fgets(cmdBuf, 2, stdin);
     clearStdinBuf();
-
+    /*
     if(0 == strlen(cmdBuf)) {
 	INFO("No input\n");
 	return -1;
     }
-
+    */
     cmd = (int)cmdBuf[0];
     return cmd;
 }
 
 // echange the char between first and second chars
 int exchange(int first, int second) {
+    /*
     if(0 > first || 0 > second || numChars <= first || numChars <= second) {
 	return 0; // fail to exchange
     }
-
+    */
     char tmp = buffer[first];
     buffer[first] = buffer[second];
     buffer[second] = tmp;
@@ -64,7 +67,8 @@ int exchange(int first, int second) {
 int markTwo(int* mark, int input) {
      int tmpMark = input - '0';
      if(-1 != *mark && tmpMark == *mark) { // if same, cancel first mark
-	 clearInput(mark);
+	 //clearInput(mark);
+	 *mark = -1;
 	 return 0;
      }
 
@@ -74,11 +78,13 @@ int markTwo(int* mark, int input) {
      }
      	    
      int ret = exchange(*mark, tmpMark);
-     clearInput(mark);
+     //clearInput(mark);
+     *mark = -1;
+/*
      if(0 == ret) {
 	 INFO("Invalid input for exchanging\n");
      }
-    
+     */
     return 0;
 }
 
@@ -87,7 +93,8 @@ int markTwo(int* mark, int input) {
 int markInsert(int* mark, int input) {
     int tmpMark = input - '0';
     if(-1 != *mark && tmpMark == *mark) { // if same, cancel first mark
-	clearInput(mark);
+	//clearInput(mark);
+	*mark = -1;
 	return 0;
     } 
 
@@ -108,7 +115,8 @@ int markInsert(int* mark, int input) {
 	}
     }
     
-    clearInput(mark);
+    //clearInput(mark);
+    *mark = -1;
     return 0;
 }
 
@@ -123,11 +131,12 @@ int chooseExchangeMethod(int method) {
     int cmd = getInput();
     
     printf("Choose %c\n", (char)cmd);
+    /*
     if('1' > cmd || '9' < cmd) {
 	INFO("%c unsupported\n", (char)cmd);
 	return -1;
     }
-    
+    */
     switch (cmd) {
     case MARKTWO:
 	exchangeFunc = &markTwo;
@@ -152,13 +161,13 @@ int rearrange(char* str, int n) {
 	//printf("%s\n",str);	
 
     int cmd = -1;
-    int intCmd = -1;
-    //char cmdBuf[16];
     int mark = -1;
     
-    if(7 < n || 3 > n) {
-	ERROR("Invalid string length\n");
-    }
+    /*
+      if(7 < n || 3 > n) {
+      ERROR("Invalid string length\n");
+      }
+    */
 
     //memset(buffer, 0, sizeof(buffer));
     //strncpy(buffer, str, n);
@@ -233,5 +242,11 @@ int main(int argc, char** argv) {
 
 	return 0;
 }
+
+
+
+
+
+
 
 

@@ -1,0 +1,1490 @@
+5,25d4
+< 
+< 	.comm	buffer,16,4
+< 	.globl	numChars
+< 	.data
+< 	.align	2
+< 	.type	numChars, @object
+< 	.size	numChars, 4
+< numChars:
+< 	.word	6
+< 	.globl	mark
+< 	.align	2
+< 	.type	mark, @object
+< 	.size	mark, 4
+< mark:
+< 	.word	-1
+< 	.globl	mark2
+< 	.align	2
+< 	.type	mark2, @object
+< 	.size	mark2, 4
+< mark2:
+< 	.word	-1
+28,70d6
+< 	.globl	clearStdinBuf
+< 	.set	nomips16
+< 	.ent	clearStdinBuf
+< 	.type	clearStdinBuf, @function
+< clearStdinBuf:
+< 	.frame	$fp,32,$31		# vars= 8, regs= 2/0, args= 16, gp= 0
+< 	.mask	0xc0000000,-4
+< 	.fmask	0x00000000,0
+< 	.set	noreorder
+< 	.set	nomacro
+< 	
+< 	addiu	$sp,$sp,-32
+< 	sw	$31,28($sp)
+< 	sw	$fp,24($sp)
+< 	move	$fp,$sp
+< $L3:
+< 	jal	getchar
+< 	nop
+< 
+< 	sw	$2,16($fp)
+< 	lw	$3,16($fp)
+< 	li	$2,10			# 0xa
+< 	beq	$3,$2,$L4
+< 	nop
+< 
+< 	lw	$3,16($fp)
+< 	li	$2,-1			# 0xffffffffffffffff
+< 	bne	$3,$2,$L3
+< 	nop
+< 
+< $L4:
+< 	move	$sp,$fp
+< 	lw	$31,28($sp)
+< 	lw	$fp,24($sp)
+< 	addiu	$sp,$sp,32
+< 	j	$31
+< 	nop
+< 
+< 	.set	macro
+< 	.set	reorder
+< 	.end	clearStdinBuf
+< 	.size	clearStdinBuf, .-clearStdinBuf
+< 	.align	2
+76,77c12,13
+< 	.frame	$fp,8,$31		# vars= 0, regs= 1/0, args= 0, gp= 0
+< 	.mask	0x40000000,-4
+---
+> 	.frame	$sp,0,$31		# vars= 0, regs= 0/0, args= 0, gp= 0
+> 	.mask	0x00000000,0
+82,88d17
+< 	addiu	$sp,$sp,-8
+< 	sw	$fp,4($sp)
+< 	move	$fp,$sp
+< 	li	$2,1			# 0x1
+< 	move	$sp,$fp
+< 	lw	$fp,4($sp)
+< 	addiu	$sp,$sp,8
+90c19
+< 	nop
+---
+> 	li	$2,1			# 0x1
+102,103c31,32
+< 	.frame	$fp,8,$31		# vars= 0, regs= 1/0, args= 0, gp= 0
+< 	.mask	0x40000000,-4
+---
+> 	.frame	$sp,0,$31		# vars= 0, regs= 0/0, args= 0, gp= 0
+> 	.mask	0x00000000,0
+108,120c37,41
+< 	addiu	$sp,$sp,-8
+< 	sw	$fp,4($sp)
+< 	move	$fp,$sp
+< 	lui	$2,%hi(mark)
+< 	li	$3,-1			# 0xffffffffffffffff
+< 	sw	$3,%lo(mark)($2)
+< 	lui	$2,%hi(mark2)
+< 	li	$3,-1			# 0xffffffffffffffff
+< 	sw	$3,%lo(mark2)($2)
+< 	li	$2,1			# 0x1
+< 	move	$sp,$fp
+< 	lw	$fp,4($sp)
+< 	addiu	$sp,$sp,8
+---
+> 	li	$2,-1			# 0xffffffffffffffff
+> 	lui	$3,%hi(mark2)
+> 	sw	$2,%lo(mark2)($3)
+> 	lui	$3,%hi(mark)
+> 	sw	$2,%lo(mark)($3)
+122c43
+< 	nop
+---
+> 	li	$2,1			# 0x1
+134,135c55,56
+< 	.frame	$fp,16,$31		# vars= 8, regs= 1/0, args= 0, gp= 0
+< 	.mask	0x40000000,-4
+---
+> 	.frame	$sp,0,$31		# vars= 0, regs= 0/0, args= 0, gp= 0
+> 	.mask	0x00000000,0
+140,152c61
+< 	addiu	$sp,$sp,-16
+< 	sw	$fp,12($sp)
+< 	move	$fp,$sp
+< 	sw	$4,16($fp)
+< 	sw	$5,20($fp)
+< 	lw	$2,16($fp)
+< 	nop
+< 	bltz	$2,$L10
+< 	nop
+< 
+< 	lw	$2,20($fp)
+< 	nop
+< 	bltz	$2,$L10
+---
+> 	bltz	$4,$L6
+155,160c64
+< 	lui	$2,%hi(numChars)
+< 	lw	$3,%lo(numChars)($2)
+< 	lw	$2,16($fp)
+< 	nop
+< 	slt	$2,$2,$3
+< 	beq	$2,$0,$L10
+---
+> 	bltz	$5,$L6
+164,165c68
+< 	lw	$3,%lo(numChars)($2)
+< 	lw	$2,20($fp)
+---
+> 	lw	$2,%lo(numChars)($2)
+167,168c70,71
+< 	slt	$2,$2,$3
+< 	bne	$2,$0,$L11
+---
+> 	slt	$3,$4,$2
+> 	beq	$3,$0,$L6
+171,173c74,75
+< $L10:
+< 	move	$2,$0
+< 	j	$L12
+---
+> 	slt	$2,$5,$2
+> 	beq	$2,$0,$L6
+176,177d77
+< $L11:
+< 	lw	$3,16($fp)
+180,200c80,83
+< 	addu	$2,$3,$2
+< 	lbu	$2,0($2)
+< 	nop
+< 	sb	$2,0($fp)
+< 	lw	$4,16($fp)
+< 	lw	$3,20($fp)
+< 	lui	$2,%hi(buffer)
+< 	addiu	$2,$2,%lo(buffer)
+< 	addu	$2,$3,$2
+< 	lb	$3,0($2)
+< 	lui	$2,%hi(buffer)
+< 	addiu	$2,$2,%lo(buffer)
+< 	addu	$2,$4,$2
+< 	sb	$3,0($2)
+< 	lw	$3,20($fp)
+< 	lui	$2,%hi(buffer)
+< 	addiu	$2,$2,%lo(buffer)
+< 	addu	$2,$3,$2
+< 	lbu	$3,0($fp)
+< 	nop
+< 	sb	$3,0($2)
+---
+> 	addu	$5,$5,$2
+> 	addu	$4,$4,$2
+> 	lb	$3,0($4)
+> 	lbu	$6,0($5)
+202,205c85
+< $L12:
+< 	move	$sp,$fp
+< 	lw	$fp,12($sp)
+< 	addiu	$sp,$sp,16
+---
+> 	sb	$6,0($4)
+207c87,91
+< 	nop
+---
+> 	sb	$3,0($5)
+> 
+> $L6:
+> 	j	$31
+> 	move	$2,$0
+213,217d96
+< 	.rdata
+< 	.align	2
+< $LC0:
+< 	.ascii	"Invalid input for exchanging\012\000"
+< 	.text
+219c98
+< 	.globl	markTwo
+---
+> 	.globl	markInsert
+221,225c100,104
+< 	.ent	markTwo
+< 	.type	markTwo, @function
+< markTwo:
+< 	.frame	$fp,32,$31		# vars= 8, regs= 2/0, args= 16, gp= 0
+< 	.mask	0xc0000000,-4
+---
+> 	.ent	markInsert
+> 	.type	markInsert, @function
+> markInsert:
+> 	.frame	$sp,0,$31		# vars= 0, regs= 0/0, args= 0, gp= 0
+> 	.mask	0x00000000,0
+230,244c109,136
+< 	addiu	$sp,$sp,-32
+< 	sw	$31,28($sp)
+< 	sw	$fp,24($sp)
+< 	move	$fp,$sp
+< 	move	$2,$4
+< 	sb	$2,32($fp)
+< 	lb	$2,32($fp)
+< 	nop
+< 	addiu	$2,$2,-48
+< 	sw	$2,20($fp)
+< 	lui	$2,%hi(mark)
+< 	lw	$3,%lo(mark)($2)
+< 	li	$2,-1			# 0xffffffffffffffff
+< 	beq	$3,$2,$L15
+< 	nop
+---
+> 	lui	$3,%hi(mark)
+> 	sll	$4,$4,24
+> 	lw	$2,%lo(mark)($3)
+> 	sra	$4,$4,24
+> 	li	$5,-1			# 0xffffffffffffffff
+> 	beq	$2,$5,$L11
+> 	addiu	$9,$4,-48
+> 
+> 	beq	$9,$2,$L24
+> 	nop
+> 
+> 	slt	$5,$2,$9
+> 	bne	$5,$0,$L25
+> 	lui	$5,%hi(buffer)
+> 
+> 	slt	$4,$9,$2
+> 	beq	$4,$0,$L17
+> 	lui	$4,%hi(numChars)
+> 
+> 	addiu	$5,$5,%lo(buffer)
+> 	lw	$7,%lo(numChars)($4)
+> 	addu	$5,$5,$2
+> 	move	$4,$2
+> $L21:
+> 	addiu	$2,$2,-1
+> 	slt	$8,$4,$7
+> 	bltz	$4,$L20
+> 	slt	$6,$9,$2
+246,250c138
+< 	lui	$2,%hi(mark)
+< 	lw	$2,%lo(mark)($2)
+< 	lw	$3,20($fp)
+< 	nop
+< 	bne	$3,$2,$L15
+---
+> 	bltz	$2,$L20
+253,254c141,142
+< 	jal	clearInput
+< 	nop
+---
+> 	beq	$8,$0,$L20
+> 	slt	$10,$2,$7
+256,257c144
+< 	move	$2,$0
+< 	j	$L16
+---
+> 	beq	$10,$0,$L20
+260,265c147,154
+< $L15:
+< 	lui	$2,%hi(mark)
+< 	lw	$3,%lo(mark)($2)
+< 	li	$2,-1			# 0xffffffffffffffff
+< 	bne	$3,$2,$L17
+< 	nop
+---
+> 	lb	$10,0($5)
+> 	lbu	$8,-1($5)
+> 	sb	$10,-1($5)
+> 	sb	$8,0($5)
+> $L20:
+> 	addiu	$4,$4,-1
+> 	bne	$6,$0,$L21
+> 	addiu	$5,$5,-1
+267,270c156,161
+< 	lui	$2,%hi(mark)
+< 	lw	$3,20($fp)
+< 	nop
+< 	sw	$3,%lo(mark)($2)
+---
+> $L17:
+> 	li	$2,-1			# 0xffffffffffffffff
+> 	lui	$4,%hi(mark2)
+> 	sw	$2,%lo(mark2)($4)
+> 	sw	$2,%lo(mark)($3)
+> 	j	$31
+272,273d162
+< 	j	$L16
+< 	nop
+275,287c164,174
+< $L17:
+< 	lui	$2,%hi(mark2)
+< 	lw	$3,20($fp)
+< 	nop
+< 	sw	$3,%lo(mark2)($2)
+< 	lui	$2,%hi(mark)
+< 	lw	$3,%lo(mark)($2)
+< 	lui	$2,%hi(mark2)
+< 	lw	$2,%lo(mark2)($2)
+< 	move	$4,$3
+< 	move	$5,$2
+< 	jal	exchange
+< 	nop
+---
+> $L25:
+> 	addiu	$9,$4,-49
+> 	addiu	$5,$5,%lo(buffer)
+> 	lui	$4,%hi(numChars)
+> 	lw	$7,%lo(numChars)($4)
+> 	addu	$5,$5,$2
+> 	move	$4,$2
+> $L15:
+> 	slt	$6,$2,$9
+> 	beq	$6,$0,$L17
+> 	slt	$8,$4,$7
+289,291c176,177
+< 	sw	$2,16($fp)
+< 	jal	clearInput
+< 	nop
+---
+> 	bltz	$4,$L18
+> 	addiu	$2,$2,1
+293,295c179
+< 	lw	$2,16($fp)
+< 	nop
+< 	bne	$2,$0,$L18
+---
+> 	bltz	$2,$L18
+298,306c182,185
+< 	lui	$2,%hi($LC0)
+< 	addiu	$3,$2,%lo($LC0)
+< 	lui	$2,%hi(stdout)
+< 	lw	$2,%lo(stdout)($2)
+< 	move	$4,$3
+< 	li	$5,1			# 0x1
+< 	li	$6,29			# 0x1d
+< 	move	$7,$2
+< 	jal	fwrite
+---
+> 	beq	$8,$0,$L18
+> 	slt	$6,$2,$7
+> 
+> 	beq	$6,$0,$L18
+308a188,191
+> 	lb	$8,0($5)
+> 	lbu	$6,1($5)
+> 	sb	$8,1($5)
+> 	sb	$6,0($5)
+309a193,199
+> 	addiu	$4,$4,1
+> 	j	$L15
+> 	addiu	$5,$5,1
+> 
+> $L11:
+> 	sw	$9,%lo(mark)($3)
+> 	j	$31
+311,315c201,205
+< $L16:
+< 	move	$sp,$fp
+< 	lw	$31,28($sp)
+< 	lw	$fp,24($sp)
+< 	addiu	$sp,$sp,32
+---
+> 
+> $L24:
+> 	lui	$2,%hi(mark2)
+> 	sw	$5,%lo(mark2)($2)
+> 	sw	$5,%lo(mark)($3)
+317c207
+< 	nop
+---
+> 	move	$2,$0
+321,322c211,213
+< 	.end	markTwo
+< 	.size	markTwo, .-markTwo
+---
+> 	.end	markInsert
+> 	.size	markInsert, .-markInsert
+> 	.section	.rodata.str1.4,"aMS",@progbits,1
+324c215,219
+< 	.globl	markInsert
+---
+> $LC0:
+> 	.ascii	"Invalid input for exchanging\012\000"
+> 	.text
+> 	.align	2
+> 	.globl	markTwo
+326,330c221,225
+< 	.ent	markInsert
+< 	.type	markInsert, @function
+< markInsert:
+< 	.frame	$fp,40,$31		# vars= 16, regs= 2/0, args= 16, gp= 0
+< 	.mask	0xc0000000,-4
+---
+> 	.ent	markTwo
+> 	.type	markTwo, @function
+> markTwo:
+> 	.frame	$sp,24,$31		# vars= 0, regs= 1/0, args= 16, gp= 0
+> 	.mask	0x80000000,-4
+335,365d229
+< 	addiu	$sp,$sp,-40
+< 	sw	$31,36($sp)
+< 	sw	$fp,32($sp)
+< 	move	$fp,$sp
+< 	move	$2,$4
+< 	sb	$2,40($fp)
+< 	lb	$2,40($fp)
+< 	nop
+< 	addiu	$2,$2,-48
+< 	sw	$2,24($fp)
+< 	lui	$2,%hi(mark)
+< 	lw	$3,%lo(mark)($2)
+< 	li	$2,-1			# 0xffffffffffffffff
+< 	beq	$3,$2,$L21
+< 	nop
+< 
+< 	lui	$2,%hi(mark)
+< 	lw	$2,%lo(mark)($2)
+< 	lw	$3,24($fp)
+< 	nop
+< 	bne	$3,$2,$L21
+< 	nop
+< 
+< 	jal	clearInput
+< 	nop
+< 
+< 	move	$2,$0
+< 	j	$L22
+< 	nop
+< 
+< $L21:
+367,370c231,265
+< 	lw	$3,%lo(mark)($2)
+< 	li	$2,-1			# 0xffffffffffffffff
+< 	bne	$3,$2,$L23
+< 	nop
+---
+> 	sll	$4,$4,24
+> 	lw	$5,%lo(mark)($2)
+> 	addiu	$sp,$sp,-24
+> 	sra	$4,$4,24
+> 	li	$6,-1			# 0xffffffffffffffff
+> 	sw	$31,20($sp)
+> 	beq	$5,$6,$L27
+> 	addiu	$4,$4,-48
+> 
+> 	beq	$4,$5,$L32
+> 	lui	$3,%hi(mark2)
+> 
+> 	bltz	$5,$L30
+> 	sw	$4,%lo(mark2)($3)
+> 
+> 	bltz	$4,$L30
+> 	lui	$7,%hi(numChars)
+> 
+> 	lw	$7,%lo(numChars)($7)
+> 	nop
+> 	slt	$8,$5,$7
+> 	bne	$8,$0,$L33
+> 	slt	$7,$4,$7
+> 
+> $L30:
+> 	lui	$4,%hi(stdout)
+> 	lw	$7,%lo(stdout)($4)
+> 	lui	$4,%hi($LC0)
+> 	li	$8,-1			# 0xffffffffffffffff
+> 	addiu	$4,$4,%lo($LC0)
+> 	li	$5,1			# 0x1
+> 	li	$6,29			# 0x1d
+> 	sw	$8,%lo(mark2)($3)
+> 	jal	fwrite
+> 	sw	$8,%lo(mark)($2)
+372,375c267,268
+< 	lui	$2,%hi(mark)
+< 	lw	$3,24($fp)
+< 	nop
+< 	sw	$3,%lo(mark)($2)
+---
+> $L29:
+> 	lw	$31,20($sp)
+377,399c270,271
+< 	j	$L22
+< 	nop
+< 
+< $L23:
+< 	lui	$2,%hi(mark2)
+< 	lw	$3,24($fp)
+< 	nop
+< 	sw	$3,%lo(mark2)($2)
+< 	lui	$2,%hi(mark)
+< 	lw	$3,%lo(mark)($2)
+< 	lui	$2,%hi(mark2)
+< 	lw	$2,%lo(mark2)($2)
+< 	nop
+< 	slt	$2,$3,$2
+< 	beq	$2,$0,$L24
+< 	nop
+< 
+< 	lui	$2,%hi(mark)
+< 	lw	$2,%lo(mark)($2)
+< 	nop
+< 	sw	$2,16($fp)
+< 	j	$L25
+< 	nop
+---
+> 	j	$31
+> 	addiu	$sp,$sp,24
+401,408c273,275
+< $L26:
+< 	lw	$2,16($fp)
+< 	nop
+< 	addiu	$2,$2,1
+< 	lw	$4,16($fp)
+< 	move	$5,$2
+< 	jal	exchange
+< 	nop
+---
+> $L33:
+> 	beq	$7,$0,$L30
+> 	lui	$7,%hi(buffer)
+410,423c277,286
+< 	lw	$2,16($fp)
+< 	nop
+< 	addiu	$2,$2,1
+< 	sw	$2,16($fp)
+< $L25:
+< 	lui	$2,%hi(mark2)
+< 	lw	$2,%lo(mark2)($2)
+< 	nop
+< 	addiu	$3,$2,-1
+< 	lw	$2,16($fp)
+< 	nop
+< 	slt	$2,$2,$3
+< 	bne	$2,$0,$L26
+< 	nop
+---
+> 	addiu	$7,$7,%lo(buffer)
+> 	addu	$4,$4,$7
+> 	addu	$5,$5,$7
+> 	lb	$7,0($5)
+> 	lbu	$8,0($4)
+> 	sw	$6,%lo(mark2)($3)
+> 	sb	$8,0($5)
+> 	sw	$6,%lo(mark)($2)
+> 	j	$L29
+> 	sb	$7,0($4)
+425,426c288,293
+< 	j	$L27
+< 	nop
+---
+> $L27:
+> 	lw	$31,20($sp)
+> 	sw	$4,%lo(mark)($2)
+> 	addiu	$sp,$sp,24
+> 	j	$31
+> 	move	$2,$0
+428,434c295,301
+< $L24:
+< 	lui	$2,%hi(mark)
+< 	lw	$2,%lo(mark)($2)
+< 	nop
+< 	sw	$2,16($fp)
+< 	j	$L28
+< 	nop
+---
+> $L32:
+> 	lw	$31,20($sp)
+> 	sw	$6,%lo(mark)($2)
+> 	sw	$6,%lo(mark2)($3)
+> 	move	$2,$0
+> 	j	$31
+> 	addiu	$sp,$sp,24
+436,442c303,329
+< $L29:
+< 	lw	$2,16($fp)
+< 	nop
+< 	addiu	$2,$2,-1
+< 	lw	$4,16($fp)
+< 	move	$5,$2
+< 	jal	exchange
+---
+> 	.set	macro
+> 	.set	reorder
+> 	.end	markTwo
+> 	.size	markTwo, .-markTwo
+> 	.align	2
+> 	.globl	clearStdinBuf
+> 	.set	nomips16
+> 	.ent	clearStdinBuf
+> 	.type	clearStdinBuf, @function
+> clearStdinBuf:
+> 	.frame	$sp,32,$31		# vars= 0, regs= 4/0, args= 16, gp= 0
+> 	.mask	0x80070000,-4
+> 	.fmask	0x00000000,0
+> 	.set	noreorder
+> 	.set	nomacro
+> 	
+> 	addiu	$sp,$sp,-32
+> 	sw	$18,24($sp)
+> 	sw	$17,20($sp)
+> 	sw	$16,16($sp)
+> 	sw	$31,28($sp)
+> 	lui	$17,%hi(stdin)
+> 	li	$16,10			# 0xa
+> 	li	$18,-1			# 0xffffffffffffffff
+> $L36:
+> 	lw	$4,%lo(stdin)($17)
+> 	jal	_IO_getc
+445,455c332
+< 	lw	$2,16($fp)
+< 	nop
+< 	addiu	$2,$2,-1
+< 	sw	$2,16($fp)
+< $L28:
+< 	lui	$2,%hi(mark2)
+< 	lw	$2,%lo(mark2)($2)
+< 	lw	$3,16($fp)
+< 	nop
+< 	slt	$2,$2,$3
+< 	bne	$2,$0,$L29
+---
+> 	beq	$2,$16,$L37
+458,459c335
+< $L27:
+< 	jal	clearInput
+---
+> 	bne	$2,$18,$L36
+462,467c338,342
+< 	move	$2,$0
+< $L22:
+< 	move	$sp,$fp
+< 	lw	$31,36($sp)
+< 	lw	$fp,32($sp)
+< 	addiu	$sp,$sp,40
+---
+> $L37:
+> 	lw	$31,28($sp)
+> 	lw	$18,24($sp)
+> 	lw	$17,20($sp)
+> 	lw	$16,16($sp)
+469c344
+< 	nop
+---
+> 	addiu	$sp,$sp,32
+473,482c348,350
+< 	.end	markInsert
+< 	.size	markInsert, .-markInsert
+< 	.globl	exchangeFunc
+< 	.data
+< 	.align	2
+< 	.type	exchangeFunc, @object
+< 	.size	exchangeFunc, 4
+< exchangeFunc:
+< 	.word	markTwo
+< 	.rdata
+---
+> 	.end	clearStdinBuf
+> 	.size	clearStdinBuf, .-clearStdinBuf
+> 	.section	.rodata.str1.4
+508,509c376,377
+< 	.frame	$fp,48,$31		# vars= 24, regs= 2/0, args= 16, gp= 0
+< 	.mask	0xc0000000,-4
+---
+> 	.frame	$sp,40,$31		# vars= 16, regs= 2/0, args= 16, gp= 0
+> 	.mask	0x80010000,-4
+514,523c382,390
+< 	addiu	$sp,$sp,-48
+< 	sw	$31,44($sp)
+< 	sw	$fp,40($sp)
+< 	move	$fp,$sp
+< 	sw	$4,48($fp)
+< 	jal	clearInput
+< 	nop
+< 
+< 	lui	$2,%hi($LC1)
+< 	addiu	$4,$2,%lo($LC1)
+---
+> 	li	$2,-1			# 0xffffffffffffffff
+> 	lui	$3,%hi(mark2)
+> 	lui	$4,%hi($LC1)
+> 	addiu	$sp,$sp,-40
+> 	addiu	$4,$4,%lo($LC1)
+> 	sw	$2,%lo(mark2)($3)
+> 	lui	$3,%hi(mark)
+> 	sw	$31,36($sp)
+> 	sw	$2,%lo(mark)($3)
+525c392
+< 	nop
+---
+> 	sw	$16,32($sp)
+527,528c394
+< 	lui	$2,%hi($LC2)
+< 	addiu	$4,$2,%lo($LC2)
+---
+> 	lui	$4,%hi($LC2)
+530c396
+< 	nop
+---
+> 	addiu	$4,$4,%lo($LC2)
+532,533c398
+< 	lui	$2,%hi($LC3)
+< 	addiu	$4,$2,%lo($LC3)
+---
+> 	lui	$4,%hi($LC3)
+535c400
+< 	nop
+---
+> 	addiu	$4,$4,%lo($LC3)
+538,542c403,404
+< 	lw	$2,%lo(stdin)($2)
+< 	addiu	$3,$fp,20
+< 	move	$4,$3
+< 	li	$5,2			# 0x2
+< 	move	$6,$2
+---
+> 	lw	$6,%lo(stdin)($2)
+> 	addiu	$4,$sp,16
+544,592c406
+< 	nop
+< 
+< 	jal	clearStdinBuf
+< 	nop
+< 
+< 	addiu	$2,$fp,20
+< 	lb	$2,0($2)
+< 	nop
+< 	bne	$2,$0,$L32
+< 	nop
+< 
+< 	lui	$2,%hi($LC4)
+< 	addiu	$3,$2,%lo($LC4)
+< 	lui	$2,%hi(stdout)
+< 	lw	$2,%lo(stdout)($2)
+< 	move	$4,$3
+< 	li	$5,1			# 0x1
+< 	li	$6,9			# 0x9
+< 	move	$7,$2
+< 	jal	fwrite
+< 	nop
+< 
+< 	li	$2,-1			# 0xffffffffffffffff
+< 	j	$L33
+< 	nop
+< 
+< $L32:
+< 	lbu	$2,20($fp)
+< 	nop
+< 	sb	$2,16($fp)
+< 	lui	$2,%hi($LC5)
+< 	addiu	$3,$2,%lo($LC5)
+< 	lb	$2,16($fp)
+< 	move	$4,$3
+< 	move	$5,$2
+< 	jal	printf
+< 	nop
+< 
+< 	lb	$2,16($fp)
+< 	nop
+< 	slt	$2,$2,49
+< 	bne	$2,$0,$L34
+< 	nop
+< 
+< 	lb	$2,16($fp)
+< 	nop
+< 	slt	$2,$2,58
+< 	bne	$2,$0,$L35
+< 	nop
+---
+> 	li	$5,2			# 0x2
+594,604c408
+< $L34:
+< 	lui	$2,%hi(stdout)
+< 	lw	$2,%lo(stdout)($2)
+< 	nop
+< 	move	$4,$2
+< 	lui	$2,%hi($LC6)
+< 	addiu	$3,$2,%lo($LC6)
+< 	lb	$2,16($fp)
+< 	move	$5,$3
+< 	move	$6,$2
+< 	jal	fprintf
+---
+> 	jal	clearStdinBuf
+607,608c411
+< 	li	$2,-1			# 0xffffffffffffffff
+< 	j	$L33
+---
+> 	lb	$16,16($sp)
+609a413,414
+> 	beq	$16,$0,$L48
+> 	lui	$4,%hi($LC5)
+611,615c416,418
+< $L35:
+< 	lb	$2,16($fp)
+< 	li	$3,49			# 0x31
+< 	beq	$2,$3,$L37
+< 	nop
+---
+> 	addiu	$4,$4,%lo($LC5)
+> 	jal	printf
+> 	move	$5,$16
+617,619c420,424
+< 	li	$3,50			# 0x32
+< 	beq	$2,$3,$L38
+< 	nop
+---
+> 	addiu	$2,$16,-49
+> 	andi	$2,$2,0x00ff
+> 	sltu	$2,$2,9
+> 	beq	$2,$0,$L49
+> 	lui	$2,%hi(stdout)
+621,622c426,428
+< 	j	$L41
+< 	nop
+---
+> 	li	$2,49			# 0x31
+> 	beq	$16,$2,$L44
+> 	li	$2,50			# 0x32
+624,625c430
+< $L37:
+< 	lui	$2,%hi(exchangeFunc)
+---
+> 	beq	$16,$2,$L50
+626a432,433
+> 
+> 	lui	$2,%hi(exchangeFunc)
+629,630c436,441
+< 	j	$L39
+< 	nop
+---
+> 	li	$2,-1			# 0xffffffffffffffff
+> $L41:
+> 	lw	$31,36($sp)
+> 	lw	$16,32($sp)
+> 	j	$31
+> 	addiu	$sp,$sp,40
+632,633c443
+< $L38:
+< 	lui	$2,%hi(exchangeFunc)
+---
+> $L50:
+634a445,446
+> 	lw	$31,36($sp)
+> 	lui	$2,%hi(exchangeFunc)
+637,638c449,452
+< 	j	$L39
+< 	nop
+---
+> 	lw	$16,32($sp)
+> 	move	$2,$0
+> 	j	$31
+> 	addiu	$sp,$sp,40
+640,641c454
+< $L41:
+< 	lui	$2,%hi(exchangeFunc)
+---
+> $L44:
+642a456,457
+> 	lw	$31,36($sp)
+> 	lui	$2,%hi(exchangeFunc)
+645,649c460
+< 	li	$2,-1			# 0xffffffffffffffff
+< 	j	$L33
+< 	nop
+< 
+< $L39:
+---
+> 	lw	$16,32($sp)
+651,655d461
+< $L33:
+< 	move	$sp,$fp
+< 	lw	$31,44($sp)
+< 	lw	$fp,40($sp)
+< 	addiu	$sp,$sp,48
+657c463,485
+< 	nop
+---
+> 	addiu	$sp,$sp,40
+> 
+> $L48:
+> 	lui	$2,%hi(stdout)
+> 	lw	$7,%lo(stdout)($2)
+> 	lui	$4,%hi($LC4)
+> 	addiu	$4,$4,%lo($LC4)
+> 	li	$5,1			# 0x1
+> 	jal	fwrite
+> 	li	$6,9			# 0x9
+> 
+> 	j	$L41
+> 	li	$2,-1			# 0xffffffffffffffff
+> 
+> $L49:
+> 	lw	$4,%lo(stdout)($2)
+> 	lui	$5,%hi($LC6)
+> 	addiu	$5,$5,%lo($LC6)
+> 	jal	fprintf
+> 	move	$6,$16
+> 
+> 	j	$L41
+> 	li	$2,-1			# 0xffffffffffffffff
+663c491
+< 	.rdata
+---
+> 	.section	.rodata.str1.4
+698,699c526,527
+< 	.frame	$fp,48,$31		# vars= 24, regs= 2/0, args= 16, gp= 0
+< 	.mask	0xc0000000,-4
+---
+> 	.frame	$sp,80,$31		# vars= 24, regs= 10/0, args= 16, gp= 0
+> 	.mask	0xc0ff0000,-4
+704,724c532,546
+< 	addiu	$sp,$sp,-48
+< 	sw	$31,44($sp)
+< 	sw	$fp,40($sp)
+< 	move	$fp,$sp
+< 	sw	$4,48($fp)
+< 	sw	$5,52($fp)
+< 	li	$2,-1			# 0xffffffffffffffff
+< 	sb	$2,20($fp)
+< 	li	$2,-1			# 0xffffffffffffffff
+< 	sw	$2,16($fp)
+< 	lw	$2,52($fp)
+< 	nop
+< 	slt	$2,$2,8
+< 	beq	$2,$0,$L43
+< 	nop
+< 
+< 	lw	$2,52($fp)
+< 	nop
+< 	slt	$2,$2,3
+< 	beq	$2,$0,$L44
+< 	nop
+---
+> 	addiu	$2,$5,-3
+> 	addiu	$sp,$sp,-80
+> 	sltu	$2,$2,5
+> 	sw	$22,64($sp)
+> 	sw	$31,76($sp)
+> 	sw	$fp,72($sp)
+> 	sw	$23,68($sp)
+> 	sw	$21,60($sp)
+> 	sw	$20,56($sp)
+> 	sw	$19,52($sp)
+> 	sw	$18,48($sp)
+> 	sw	$17,44($sp)
+> 	sw	$16,40($sp)
+> 	beq	$2,$0,$L65
+> 	move	$22,$5
+726,742d547
+< $L43:
+< 	lui	$2,%hi($LC7)
+< 	addiu	$3,$2,%lo($LC7)
+< 	lui	$2,%hi(stderr)
+< 	lw	$2,%lo(stderr)($2)
+< 	move	$4,$3
+< 	li	$5,1			# 0x1
+< 	li	$6,22			# 0x16
+< 	move	$7,$2
+< 	jal	fwrite
+< 	nop
+< 
+< 	li	$4,-1			# 0xffffffffffffffff
+< 	jal	exit
+< 	nop
+< 
+< $L44:
+744,755c549,557
+< 	addiu	$4,$2,%lo(buffer)
+< 	move	$5,$0
+< 	li	$6,16			# 0x10
+< 	jal	memset
+< 	nop
+< 
+< 	lw	$3,48($fp)
+< 	lw	$2,52($fp)
+< 	lui	$4,%hi(buffer)
+< 	addiu	$4,$4,%lo(buffer)
+< 	move	$5,$3
+< 	move	$6,$2
+---
+> 	addiu	$16,$2,%lo(buffer)
+> 	move	$5,$4
+> 	sw	$0,4($16)
+> 	move	$4,$16
+> 	sw	$0,8($16)
+> 	sw	$0,12($16)
+> 	move	$6,$22
+> 	lui	$20,%hi($LC14)
+> 	sw	$0,%lo(buffer)($2)
+757,784c559
+< 	nop
+< 
+< $L56:
+< 	lui	$2,%hi(mark)
+< 	lw	$3,%lo(mark)($2)
+< 	li	$2,-1			# 0xffffffffffffffff
+< 	bne	$3,$2,$L45
+< 	nop
+< 
+< 	li	$4,10			# 0xa
+< 	jal	putchar
+< 	nop
+< 
+< 	lui	$2,%hi($LC8)
+< 	addiu	$4,$2,%lo($LC8)
+< 	jal	puts
+< 	nop
+< 
+< 	lw	$3,52($fp)
+< 	lui	$2,%hi(stdout)
+< 	lw	$2,%lo(stdout)($2)
+< 	lui	$4,%hi(buffer)
+< 	addiu	$4,$4,%lo(buffer)
+< 	li	$5,1			# 0x1
+< 	move	$6,$3
+< 	move	$7,$2
+< 	jal	fwrite
+< 	nop
+---
+> 	addiu	$20,$20,%lo($LC14)
+786,788c561,569
+< 	lui	$2,%hi($LC9)
+< 	addiu	$4,$2,%lo($LC9)
+< 	jal	puts
+---
+> 	lui	$19,%hi(mark)
+> 	lui	$18,%hi(stdin)
+> 	addiu	$17,$sp,16
+> 	li	$16,-1			# 0xffffffffffffffff
+> 	li	$21,109			# 0x6d
+> 	li	$fp,120			# 0x78
+> 	lui	$23,%hi(exchangeFunc)
+> $L64:
+> 	lw	$2,%lo(mark)($19)
+790,793c571
+< 
+< 	lui	$2,%hi($LC10)
+< 	addiu	$4,$2,%lo($LC10)
+< 	jal	puts
+---
+> 	beq	$2,$16,$L66
+796,799c574,578
+< 	lui	$2,%hi($LC11)
+< 	addiu	$4,$2,%lo($LC11)
+< 	jal	puts
+< 	nop
+---
+> $L54:
+> 	lw	$6,%lo(stdin)($18)
+> 	move	$4,$17
+> 	jal	fgets
+> 	li	$5,2			# 0x2
+801,803c580
+< 	lui	$2,%hi($LC12)
+< 	addiu	$4,$2,%lo($LC12)
+< 	jal	puts
+---
+> 	jal	clearStdinBuf
+806,813c583
+< $L45:
+< 	lui	$2,%hi(stdin)
+< 	lw	$2,%lo(stdin)($2)
+< 	addiu	$3,$fp,24
+< 	move	$4,$3
+< 	li	$5,2			# 0x2
+< 	move	$6,$2
+< 	jal	fgets
+---
+> 	lb	$3,16($sp)
+814a585,586
+> 	beq	$3,$0,$L67
+> 	move	$5,$3
+816,817c588,590
+< 	jal	clearStdinBuf
+< 	nop
+---
+> 	move	$4,$20
+> 	jal	printf
+> 	sw	$3,32($sp)
+819,820c592
+< 	addiu	$2,$fp,24
+< 	lb	$2,0($2)
+---
+> 	lw	$3,32($sp)
+822c594,597
+< 	bne	$2,$0,$L46
+---
+> 	addiu	$2,$3,-48
+> 	andi	$2,$2,0x00ff
+> 	sltu	$2,$2,10
+> 	bne	$2,$0,$L68
+825,834c600,601
+< 	lui	$2,%hi($LC13)
+< 	addiu	$3,$2,%lo($LC13)
+< 	lui	$2,%hi(stderr)
+< 	lw	$2,%lo(stderr)($2)
+< 	move	$4,$3
+< 	li	$5,1			# 0x1
+< 	li	$6,48			# 0x30
+< 	move	$7,$2
+< 	jal	fwrite
+< 	nop
+---
+> 	beq	$3,$21,$L59
+> 	slt	$2,$3,110
+836,838c603,604
+< 	li	$4,-1			# 0xffffffffffffffff
+< 	jal	exit
+< 	nop
+---
+> 	beq	$2,$0,$L61
+> 	li	$2,10			# 0xa
+840,850c606,607
+< $L46:
+< 	lbu	$2,24($fp)
+< 	nop
+< 	sb	$2,20($fp)
+< 	lui	$2,%hi($LC14)
+< 	addiu	$3,$2,%lo($LC14)
+< 	lb	$2,20($fp)
+< 	move	$4,$3
+< 	move	$5,$2
+< 	jal	printf
+< 	nop
+---
+> 	beq	$3,$2,$L57
+> 	li	$2,101			# 0x65
+852,856c609,610
+< 	lb	$2,20($fp)
+< 	nop
+< 	slt	$2,$2,48
+< 	bne	$2,$0,$L47
+< 	nop
+---
+> 	bne	$3,$2,$L64
+> 	li	$2,1			# 0x1
+858,861c612
+< 	lb	$2,20($fp)
+< 	nop
+< 	slt	$2,$2,58
+< 	beq	$2,$0,$L47
+---
+> 	j	$L62
+864,866c615,616
+< 	lui	$2,%hi(exchangeFunc)
+< 	lw	$2,%lo(exchangeFunc)($2)
+< 	lb	$3,20($fp)
+---
+> $L68:
+> 	lw	$2,%lo(exchangeFunc)($23)
+868d617
+< 	move	$4,$3
+870c619
+< 	nop
+---
+> 	move	$4,$3
+872c621
+< 	j	$L48
+---
+> 	lw	$2,%lo(mark)($19)
+874,878c623
+< 
+< $L47:
+< 	lb	$2,20($fp)
+< 	li	$3,101			# 0x65
+< 	beq	$2,$3,$L51
+---
+> 	bne	$2,$16,$L54
+881,883c626,628
+< 	slt	$3,$2,102
+< 	beq	$3,$0,$L54
+< 	nop
+---
+> $L66:
+> 	jal	putchar
+> 	li	$4,10			# 0xa
+885,887c630,632
+< 	li	$3,10			# 0xa
+< 	beq	$2,$3,$L49
+< 	nop
+---
+> 	lui	$4,%hi($LC8)
+> 	jal	puts
+> 	addiu	$4,$4,%lo($LC8)
+889,891c634,640
+< 	li	$3,99			# 0x63
+< 	beq	$2,$3,$L50
+< 	nop
+---
+> 	lui	$2,%hi(stdout)
+> 	lw	$7,%lo(stdout)($2)
+> 	lui	$4,%hi(buffer)
+> 	li	$5,1			# 0x1
+> 	move	$6,$22
+> 	jal	fwrite
+> 	addiu	$4,$4,%lo(buffer)
+893,894c642,644
+< 	j	$L56
+< 	nop
+---
+> 	lui	$4,%hi($LC9)
+> 	jal	puts
+> 	addiu	$4,$4,%lo($LC9)
+896,899c646,648
+< $L54:
+< 	li	$3,109			# 0x6d
+< 	beq	$2,$3,$L52
+< 	nop
+---
+> 	lui	$4,%hi($LC10)
+> 	jal	puts
+> 	addiu	$4,$4,%lo($LC10)
+901,903c650,652
+< 	li	$3,120			# 0x78
+< 	beq	$2,$3,$L53
+< 	nop
+---
+> 	lui	$4,%hi($LC11)
+> 	jal	puts
+> 	addiu	$4,$4,%lo($LC11)
+905,906c654,656
+< 	j	$L56
+< 	nop
+---
+> 	lui	$4,%hi($LC12)
+> 	jal	puts
+> 	addiu	$4,$4,%lo($LC12)
+908,909c658
+< $L50:
+< 	jal	compare
+---
+> 	j	$L54
+912,913c661,663
+< 	j	$L48
+< 	nop
+---
+> $L61:
+> 	bne	$3,$fp,$L64
+> 	move	$2,$0
+915,918c665,677
+< $L51:
+< 	li	$2,1			# 0x1
+< 	j	$L55
+< 	nop
+---
+> $L62:
+> 	lw	$31,76($sp)
+> 	lw	$fp,72($sp)
+> 	lw	$23,68($sp)
+> 	lw	$22,64($sp)
+> 	lw	$21,60($sp)
+> 	lw	$20,56($sp)
+> 	lw	$19,52($sp)
+> 	lw	$18,48($sp)
+> 	lw	$17,44($sp)
+> 	lw	$16,40($sp)
+> 	j	$31
+> 	addiu	$sp,$sp,80
+920,923c679,680
+< $L49:
+< 	lui	$2,%hi($LC15)
+< 	addiu	$2,$2,%lo($LC15)
+< 	move	$4,$2
+---
+> $L57:
+> 	lui	$4,%hi($LC15)
+925c682
+< 	nop
+---
+> 	addiu	$4,$4,%lo($LC15)
+927c684
+< 	j	$L48
+---
+> 	j	$L64
+930,931c687
+< $L52:
+< 	move	$4,$0
+---
+> $L59:
+933c689
+< 	nop
+---
+> 	move	$4,$0
+935c691
+< 	j	$L48
+---
+> 	j	$L64
+938,941c694,701
+< $L53:
+< 	move	$2,$0
+< 	j	$L55
+< 	nop
+---
+> $L67:
+> 	lui	$2,%hi(stderr)
+> 	lw	$7,%lo(stderr)($2)
+> 	lui	$4,%hi($LC13)
+> 	addiu	$4,$4,%lo($LC13)
+> 	li	$5,1			# 0x1
+> 	jal	fwrite
+> 	li	$6,48			# 0x30
+943,945c703,704
+< $L48:
+< 	j	$L56
+< 	nop
+---
+> 	jal	exit
+> 	li	$4,-1			# 0xffffffffffffffff
+947,953c706,716
+< $L55:
+< 	move	$sp,$fp
+< 	lw	$31,44($sp)
+< 	lw	$fp,40($sp)
+< 	addiu	$sp,$sp,48
+< 	j	$31
+< 	nop
+---
+> $L65:
+> 	lui	$2,%hi(stderr)
+> 	lw	$7,%lo(stderr)($2)
+> 	lui	$4,%hi($LC7)
+> 	addiu	$4,$4,%lo($LC7)
+> 	li	$5,1			# 0x1
+> 	jal	fwrite
+> 	li	$6,22			# 0x16
+> 
+> 	jal	exit
+> 	li	$4,-1			# 0xffffffffffffffff
+959c722
+< 	.rdata
+---
+> 	.section	.rodata.str1.4
+970,971c733,734
+< 	.frame	$fp,32,$31		# vars= 8, regs= 2/0, args= 16, gp= 0
+< 	.mask	0xc0000000,-4
+---
+> 	.frame	$sp,24,$31		# vars= 0, regs= 2/0, args= 16, gp= 0
+> 	.mask	0x80010000,-4
+976,1001c739,743
+< 	addiu	$sp,$sp,-32
+< 	sw	$31,28($sp)
+< 	sw	$fp,24($sp)
+< 	move	$fp,$sp
+< 	sw	$4,32($fp)
+< 	sw	$5,36($fp)
+< 	lw	$2,32($fp)
+< 	nop
+< 	slt	$2,$2,2
+< 	beq	$2,$0,$L59
+< 	nop
+< 
+< 	lui	$2,%hi($LC16)
+< 	addiu	$3,$2,%lo($LC16)
+< 	lui	$2,%hi(stderr)
+< 	lw	$2,%lo(stderr)($2)
+< 	move	$4,$3
+< 	li	$5,1			# 0x1
+< 	li	$6,33			# 0x21
+< 	move	$7,$2
+< 	jal	fwrite
+< 	nop
+< 
+< 	li	$4,-1			# 0xffffffffffffffff
+< 	jal	exit
+< 	nop
+---
+> 	addiu	$sp,$sp,-24
+> 	slt	$4,$4,2
+> 	sw	$31,20($sp)
+> 	bne	$4,$0,$L72
+> 	sw	$16,16($sp)
+1003,1010c745
+< $L59:
+< 	lw	$2,36($fp)
+< 	nop
+< 	addiu	$2,$2,4
+< 	lw	$2,0($2)
+< 	nop
+< 	sw	$2,20($fp)
+< 	lw	$4,20($fp)
+---
+> 	lw	$16,4($5)
+1012c747
+< 	nop
+---
+> 	move	$4,$16
+1014,1021c749
+< 	addiu	$2,$2,-1
+< 	sw	$2,16($fp)
+< 	lw	$2,16($fp)
+< 	nop
+< 	addiu	$2,$2,1
+< 	sw	$2,16($fp)
+< 	lw	$4,20($fp)
+< 	lw	$5,16($fp)
+---
+> 	move	$5,$2
+1023c751
+< 	nop
+---
+> 	move	$4,$16
+1024a753
+> 	lw	$31,20($sp)
+1026,1029c755
+< 	move	$sp,$fp
+< 	lw	$31,28($sp)
+< 	lw	$fp,24($sp)
+< 	addiu	$sp,$sp,32
+---
+> 	lw	$16,16($sp)
+1031c757,769
+< 	nop
+---
+> 	addiu	$sp,$sp,24
+> 
+> $L72:
+> 	lui	$2,%hi(stderr)
+> 	lw	$7,%lo(stderr)($2)
+> 	lui	$4,%hi($LC16)
+> 	addiu	$4,$4,%lo($LC16)
+> 	li	$5,1			# 0x1
+> 	jal	fwrite
+> 	li	$6,33			# 0x21
+> 
+> 	jal	exit
+> 	li	$4,-1			# 0xffffffffffffffff
+1036a775,801
+> 	.globl	numChars
+> 	.data
+> 	.align	2
+> 	.type	numChars, @object
+> 	.size	numChars, 4
+> numChars:
+> 	.word	6
+> 	.globl	mark
+> 	.align	2
+> 	.type	mark, @object
+> 	.size	mark, 4
+> mark:
+> 	.word	-1
+> 	.globl	mark2
+> 	.align	2
+> 	.type	mark2, @object
+> 	.size	mark2, 4
+> mark2:
+> 	.word	-1
+> 	.globl	exchangeFunc
+> 	.align	2
+> 	.type	exchangeFunc, @object
+> 	.size	exchangeFunc, 4
+> exchangeFunc:
+> 	.word	markTwo
+> 
+> 	.comm	buffer,16,4
