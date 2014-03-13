@@ -282,34 +282,27 @@ rearrange:
 	li	$s6, 109			# 0x6d
 	li	$s7, 120			# 0x78
 	li	$fp, 99			# 0x63
-.L52:
+inputLoop:
 	lw	$v0, 0($sp)
 	#nop
-	bne	$v0, $s2, .L42
+	bne	$v0, $s2, noPrintManual		# mark = -1?
 	nop
 	print_str("\n")
 
 	print_str("Input the index of the char you want to exchange")
-	print_str_r($s1)
+	print_str_r($s1)	# print buffer
+	
+	print_str("\012Or choose option:\n")
+	print_str("x to exit the program\n")
+	print_str("m to choose exchange method\n")
+	print_str("c to compare the string with list\n")
 
-	la	$a0, .LC5
-	jal	puts
-	la	$a0, .LC6
-	jal	puts
-	la	$a0, .LC7
-	jal	puts
-	la	$a0, .LC8
-	jal	puts
-.L42:
-	jal	putchar
-	li	$a0, 10			# 0xa
-
-	move	$a0, $s3
-	jal	printf
-	move	$a1, $s1
-
-	jal	putchar
-	li	$a0, 10			# 0xa
+noPrintManual:
+	print_str("\n")
+	print_str("\t")
+	print_str_r($s1)	# print buffer
+	print_str("\n")
+	print_str("\n")
 
 	jal	getInput
 	move	$s0, $v0
@@ -328,7 +321,7 @@ rearrange:
 	jalr	$v0
 	move	$a1, $s0
 
-	j	.L52
+	j	inputLoop
 .L43:
 	beq	$s0, $s5, .L46
 	slt	$v0, $s0, 102
@@ -338,7 +331,7 @@ rearrange:
 
 	beq	$s0, $v0, .L45
 	bne	$s0, $fp, .L44
-	j	.L52
+	j	inputLoop
 .L49:
 	beq	$s0, $s6, .L47
 	bne	$s0, $s7, .L44
@@ -348,16 +341,16 @@ rearrange:
 .L45:
 	la	$a0, .LC11
 	jal	printf
-	j	.L52
+	j	inputLoop
 .L47:
 	jal	chooseExchangeMethod
 	move	$a0, $zero
 
-	j	.L52
+	j	inputLoop
 .L44:
 	la	$a0, .LC12
 	jal	puts
-	j	.L52
+	j	inputLoop
 .L46:
 	li	$v0, 1			# 0x1
 .L50:
