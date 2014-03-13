@@ -286,16 +286,11 @@ rearrange:
 	lw	$v0, 0($sp)
 	#nop
 	bne	$v0, $s2, .L42
-	jal	putchar
-	li	$a0, 10			# 0xa
+	nop
+	print_str("\n")
 
-	la	$a0, .LC4
-	jal	puts
-	move	$a0, $s1
-	lw	$a2, 8($sp)
-	lw	$a3, stdout
-	jal	fwrite
-	li	$a1, 1			# 0x1
+	print_str("Input the index of the char you want to exchange")
+	print_str_r($s1)
 
 	la	$a0, .LC5
 	jal	puts
@@ -380,13 +375,27 @@ rearrange:
 	addiu	$sp, $sp, 56
 
 
+.macro	print_str_r(%reg)
+	addi	$sp, $sp, -4
+	sw	$v0, $sp
+	move	$a0, %reg
+	li	$v0, 4
+	syscall
+	lw	$v0, $sp
+	addi	$sp, $sp, 4
+.end_macro	
+
 .macro print_str (%str)
+	addi	$sp, $sp, -4
+	sw	$v0, $sp
 	.data
 myLabel: .asciiz %str
 	.text
 	li $v0, 4
 	la $a0, myLabel
 	syscall
+	lw	$v0, $sp
+	addi	$sp, $sp, 4
 .end_macro
 
 .macro exit()
