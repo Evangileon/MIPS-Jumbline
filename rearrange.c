@@ -227,7 +227,7 @@ int rearrange(char* str, int n) {
     return 0;
 }
 
-
+/*
 int main(int argc, char** argv) {
 	if(argc < 2) {
 		ERROR("Input format: ./rearrange {WORD}\n");	
@@ -242,7 +242,7 @@ int main(int argc, char** argv) {
 
 	return 0;
 }
-
+*/
 
 
 
