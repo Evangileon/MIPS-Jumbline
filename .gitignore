@@ -2,7 +2,7 @@
 *.o
 *.ko
 *.d
-*.s
+
 
 # Libraries
 *.lib
