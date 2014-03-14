@@ -41,14 +41,11 @@ buffer:
 
 .text
 
-.macro readChar
-addi	$sp, $sp, -4
-sw	$v0, 0($sp)
-li	$v0, 12
-syscall
-lw	$v0, 0($sp)
-addi	$sp, $sp, 4
-.end_macro
+read_char:
+	li	$v0, 12
+	syscall
+	jr	$ra
+
 
 
 .macro	print_char_r(%reg)
@@ -270,7 +267,7 @@ chooseExchangeMethod:
 	print_str("1 to markTwo\n")
 	print_str("2 to markInsert\n")
 	
-	readChar()
+	jal	read_char
 	
 	#move	$s0, $v0
 	
@@ -310,21 +307,22 @@ rearrange:
 	#.mask	0xc0ff0000, -4
 	#.fmask	0x00000000, 0
 	
-	addi	$sp, $sp, -24
-	sw	$ra, 20($sp)
-	sw	$s3, 16($sp)
-	sw	$s2, 12($sp)
-	sw	$s1, 8($sp)
-	sw	$s0, 4($sp)
-	sw	$v0, 0($sp)
-	
-
-	move	$s0, $a0		# mark addr is $a0 and $s0, value is in $s3
-	move	$s1, $a1
-	lw	$s3, 0($s0)
-	la	$s2, buffer
+	addi	$sp, $sp, -28
+	sw	$ra, 24($sp)
+	sw	$s3, 20($sp)
+	sw	$s2, 16($sp)
+	sw	$s1, 12($sp)
+	sw	$s0, 8($sp)
+	sw	$v0, 4($sp)
 	
 	li	$t1, -1
+	
+	addi	$s0, $sp, 4
+	move	$s0, $a0		# mark addr is $a0 and $s0, value is in $s3
+	move	$s1, $a1
+	move	$s3, $t1
+	sw	$s3, 0($s0)
+	la	$s2, buffer
 	
 inputLoop:
 	
@@ -347,7 +345,7 @@ noPrintManual:
 	print_str("\n")
 	print_str("\n")
 
-	readChar()
+	jal	read_char
 	move	$t0, $v0	# newly read char in t0
 	
 
@@ -389,12 +387,12 @@ chooseInputMethod:
 	j	inputLoop
 endRearrange:
 	li	$v0, 1			# 0x1
-	sw	$ra, 20($sp)
-	sw	$s3, 16($sp)
-	sw	$s2, 12($sp)
-	sw	$s1, 8($sp)
-	sw	$s0, 4($sp)
-	sw	$v0, 0($sp)
+	sw	$ra, 24($sp)
+	sw	$s3, 20($sp)
+	sw	$s2, 16($sp)
+	sw	$s1, 12($sp)
+	sw	$s0, 8($sp)
+	sw	$v0, 4($sp)
 	addi	$sp, $sp, 24
 	jr	$ra
 
