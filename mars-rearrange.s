@@ -195,10 +195,7 @@ getInput:
 	j	$ra
 	addiu	$sp, $sp, 16
 
-.macro readChar
-li	$v0, 12
-syscall
-.end_macro
+
 	
 	
 	.text
@@ -260,28 +257,17 @@ rearrange:
 	#.frame	$sp, 56, $ra		# vars= 16,  regs= 10/0,  args= 0,  gp= 0
 	#.mask	0xc0ff0000, -4
 	#.fmask	0x00000000, 0
-	addiu	$sp, $sp, -56
-	sw	$ra, 52($sp)
-	sw	$fp, 48($sp)
-	sw	$s7, 44($sp)
-	sw	$s6, 40($sp)
-	sw	$s5, 36($sp)
-	sw	$s4, 32($sp)
-	sw	$s3, 28($sp)
-	sw	$s2, 24($sp)
-	sw	$s1, 20($sp)
-	sw	$s0, 16($sp)
-	sw	$a1, 8($sp)
+	addiu	$sp, $sp, -24
+	sw	$ra, 20($sp)
+	sw	$s2, 16($sp)
+	sw	$s1, 12($sp)
+	sw	$s0, 8($sp)
+	sw	$a1, 4($sp)
 	li	$v0, -1			# 0xffffffffffffffff
 	sw	$v0, 0($sp)
 	li	$s2, -1			# 0xffffffffffffffff
 	la	$s1, buffer
-	la	$s3, .LC9
-	la	$s4, .LC10
-	li	$s5, 101			# 0x65
-	li	$s6, 109			# 0x6d
-	li	$s7, 120			# 0x78
-	li	$fp, 99			# 0x63
+	
 inputLoop:
 	lw	$v0, 0($sp)
 	#nop
@@ -304,16 +290,20 @@ noPrintManual:
 	print_str("\n")
 	print_str("\n")
 
-	jal	getInput
+	readChar()
 	move	$s0, $v0
-	move	$a0, $s4
-	sll	$a1, $v0, 24
-	jal	printf
-	sra	$a1, $a1, 24
+	#move	$a0, $s4
+	#sll	$a1, $v0, 24
+	#jal	printf
+	#sra	$a1, $a1, 24
 
-	addiu	$v0, $s0, -48
+	print_str("Input: ")
+	print_char_r($v0)
+	print_str("\n")
+
+	addiu	$v0, $s0, -48		 # char - '0'
 	sltu	$v0, $v0, 10
-	beq	$v0, $zero, .L43
+	beq	$v0, $zero, notANumber	 # not a number
 	move	$a0, $sp
 
 	lw	$v0, exchangeFunc
@@ -322,51 +312,60 @@ noPrintManual:
 	move	$a1, $s0
 
 	j	inputLoop
-.L43:
-	beq	$s0, $s5, .L46
-	slt	$v0, $s0, 102
-
-	beq	$v0, $zero, .L49
-	li	$v0, 10			# 0xa
-
-	beq	$s0, $v0, .L45
-	bne	$s0, $fp, .L44
+	nop
+notANumber:
+	li	$t0, 99		# 99 c
+	jal	$s0, $t0, compare
+	nop
+	li	$t0, 101
+	beq	$s0, $t0, endRearrange		# 101 e
+	nop
+	li	$t0, 109			# 109 m
+	beq	$s0, $t0, chooseInputMethod
+	nop
+	li	$t0, 120		# 120 x
+	beq	$s0, $t0, endRearrange
+	nop
+	print_str("Invalid input\n")
 	j	inputLoop
-.L49:
-	beq	$s0, $s6, .L47
-	bne	$s0, $s7, .L44
-	move	$v0, $zero
-
-	j	.L50
-.L45:
-	la	$a0, .LC11
-	jal	printf
-	j	inputLoop
-.L47:
+	nop
+chooseInputMethod:
 	jal	chooseExchangeMethod
 	move	$a0, $zero
 
 	j	inputLoop
-.L44:
-	la	$a0, .LC12
-	jal	puts
-	j	inputLoop
-.L46:
+	nop
+endRearrange:
 	li	$v0, 1			# 0x1
-.L50:
-	lw	$ra, 52($sp)
-	lw	$fp, 48($sp)
-	lw	$s7, 44($sp)
-	lw	$s6, 40($sp)
-	lw	$s5, 36($sp)
-	lw	$s4, 32($sp)
-	lw	$s3, 28($sp)
-	lw	$s2, 24($sp)
-	lw	$s1, 20($sp)
-	lw	$s0, 16($sp)
+	lw	$ra, 20($sp)
+	lw	$s2, 16($sp)
+	lw	$s1, 12($sp)
+	lw	$s0, 8($sp)
+	lw	$a1, 4($sp)
 	j	$ra
-	addiu	$sp, $sp, 56
+	addiu	$sp, $sp, 24
 
+.macro readChar
+addi	$sp, $sp, -4
+sw	$v0, $sp
+li	$v0, 12
+syscall
+lw	$v0, $sp
+addi	$sp, $sp, 4
+.end_macro
+
+
+.macro	print_char_r(%reg)
+	addi	$sp, $sp, -8
+	sw	$a0, 4($sp)
+	sw	$v0, 0($sp)
+	move	$a0, %reg
+	li	$v0, 11
+	syscall
+	lw	$a0, 4($sp)
+	lw	$v0, 0($sp)
+	addi	$sp, $sp, 8
+.end_macro
 
 .macro	print_str_r(%reg)
 	addi	$sp, $sp, -4
