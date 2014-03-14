@@ -309,26 +309,31 @@ rearrange:
 	#.frame	$sp, 56, $ra		# vars= 16,  regs= 10/0,  args= 0,  gp= 0
 	#.mask	0xc0ff0000, -4
 	#.fmask	0x00000000, 0
+	
 	addi	$sp, $sp, -24
 	sw	$ra, 20($sp)
-	sw	$s2, 16($sp)
-	sw	$s1, 12($sp)
-	sw	$s0, 8($sp)
-	sw	$a1, 4($sp)
-	li	$v0, -1			# 0xffffffffffffffff
+	sw	$s3, 16($sp)
+	sw	$s2, 12($sp)
+	sw	$s1, 8($sp)
+	sw	$s0, 4($sp)
 	sw	$v0, 0($sp)
-	li	$s2, -1			# 0xffffffffffffffff
-	la	$s1, buffer
+	
+
+	move	$s0, $a0		# mark addr is $a0 and $s0, value is in $s3
+	move	$s1, $a1
+	lw	$s3, 0($s0)
+	la	$s2, buffer
+	
+	li	$t1, -1
 	
 inputLoop:
-	lw	$v0, 0($sp)
-	#nop
-	bne	$v0, $s2, noPrintManual		# mark = -1?
-	nop
+	
+	bne	$s3, $t1, noPrintManual		# mark = -1?
+	
 	print_str("\n")
 
 	print_str("Input the index of the char you want to exchange")
-	print_str_r($s1)	# print buffer
+	print_str_r($s2)	# print buffer
 	
 	print_str("\012Or choose option:\n")
 	print_str("x to exit the program\n")
@@ -338,67 +343,60 @@ inputLoop:
 noPrintManual:
 	print_str("\n")
 	print_str("\t")
-	print_str_r($s1)	# print buffer
+	print_str_r($s2)	# print buffer
 	print_str("\n")
 	print_str("\n")
 
 	readChar()
-	move	$s0, $v0
-	#move	$a0, $s4
-	#sll	$a1, $v0, 24
-	#jal	printf
-	#sra	$a1, $a1, 24
+	move	$t0, $v0	# newly read char in t0
+	
 
 	print_str("Input: ")
-	print_char_r($v0)
+	print_char_r($t0)
 	print_str("\n")
 
-	addi	$v0, $s0, -48		 # char - '0'
+	addi	$v0, $v0, -48		 # char - '0'
 	sltiu	$v0, $v0, 10
 	beq	$v0, $zero, notANumber	 # not a number
-	move	$a0, $sp
-
+	
+	move	$a0, $s0	# addr of mark
+	move	$a1, $t0
 	lw	$v0, exchangeFunc
-	#nop
 	jalr	$v0
-	move	$a1, $s0
-
+	
 	j	inputLoop
-	nop
+
 notANumber:
-	li	$t0, 99		# 99 c
-	beq	$s0, $t0, compareBuffer
-	nop
-	li	$t0, 101
-	beq	$s0, $t0, endRearrange		# 101 e
-	nop
-	li	$t0, 109			# 109 m
-	beq	$s0, $t0, chooseInputMethod
-	nop
-	li	$t0, 120		# 120 x
-	beq	$s0, $t0, endRearrange
-	nop
+	li	$t3, 99		# 99 c
+	beq	$t3, $t0, compareBuffer
+	
+	li	$t3, 101
+	beq	$t3, $t0, endRearrange		# 101 e
+	
+	li	$t3, 109			# 109 m
+	beq	$t3, $t0, chooseInputMethod
+	
+	li	$t3, 120		# 120 x
+	beq	$t3, $t0, endRearrange
+	
 	print_str("Invalid input\n")
 	j	inputLoop
-	nop
+	
 compareBuffer:
 	jal	compare
-	nop
 chooseInputMethod:
 	jal	chooseExchangeMethod
-	move	$a0, $zero
-
 	j	inputLoop
-	nop
 endRearrange:
 	li	$v0, 1			# 0x1
-	lw	$ra, 20($sp)
-	lw	$s2, 16($sp)
-	lw	$s1, 12($sp)
-	lw	$s0, 8($sp)
-	lw	$a1, 4($sp)
-	jr	$ra
+	sw	$ra, 20($sp)
+	sw	$s3, 16($sp)
+	sw	$s2, 12($sp)
+	sw	$s1, 8($sp)
+	sw	$s0, 4($sp)
+	sw	$v0, 0($sp)
 	addi	$sp, $sp, 24
+	jr	$ra
 
 
 
