@@ -260,49 +260,45 @@ okMarkInsert:
 .globl	chooseExchangeMethod
 chooseExchangeMethod:
 	#.frame	$sp, 8, $ra		# vars= 0,  regs= 2/0,  args= 0,  gp= 0
-	addiu	$sp, $sp, -8
-	sw	$ra, 4($sp)
-	la	$a0, .LC0
-	jal	puts
-	sw	$s0, 0($sp)
+	addiu	$sp, $sp, -4
+	sw	$ra, 0($sp)
+	print_str("Select the method:\n")
 
-	la	$a0, .LC1
-	jal	puts
-	la	$a0, .LC2
-	jal	puts
-	jal	getInput
-	move	$s0, $v0
-	la	$a0, .LC3
-	sll	$a1, $v0, 24
-	jal	printf
-	sra	$a1, $a1, 24
+	print_str("1 to markTwo\n")
+	print_str("2 to markInsert\n")
+	
+	readChar()
+	
+	#move	$s0, $v0
+	
+	print_char_r($v0)
 
-	li	$v0, 49			# 0x31
-	beq	$s0, $v0, .L34
-	li	$v0, 50			# 0x32
-	bne	$s0, $v0, .L38
-	j	.L39
-.L34:
-	la	$v0, markTwo
-	sw	$v0, exchangeFunc
-	j	.L36
+	li	$t0, 49			# 0x31  1
+	beq	$v0, $t0, chooseMarkTwo
+	li	$t0, 50			# 0x32  2
+	bne	$v0, $t0, chooseMarkInsert
+	j	chooseOthers
+	nop
+chooseMarkTwo:
+	la	$t1, markTwo
+	sw	$t1, exchangeFunc
+	j	endChoose
 	move	$v0, $zero
 
-.L39:
-	la	$v0, markInsert
-	sw	$v0, exchangeFunc
-	j	.L36
+chooseOthers:
+	la	$t1, markInsert
+	sw	$t1, exchangeFunc
+	j	endChoose
 	move	$v0, $zero
 
-.L38:
-	la	$v0, markTwo
-	sw	$v0, exchangeFunc
+chooseMarkInsert:
+	la	$t1, markTwo
+	sw	$t1, exchangeFunc
 	li	$v0, -1			# 0xffffffffffffffff
-.L36:
-	lw	$ra, 4($sp)
-	lw	$s0, 0($sp)
+endChoose:
+	lw	$ra, 0($sp)
 	jr	$ra
-	addiu	$sp, $sp, 8
+	addiu	$sp, $sp, 4
 
 	
 	
@@ -426,7 +422,7 @@ valid:
 	sw	$v0, numChars
 	la	$a0, buffer
 	move	$a1, $s1
-	jal	strncpy
+	jal	strcpy
 	move	$a2, $v0
 
 	move	$a0, $s1
