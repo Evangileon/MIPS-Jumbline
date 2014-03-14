@@ -39,17 +39,98 @@ numChars:
 buffer:
 	.space	16
 
+.text
+
+.macro readChar
+addi	$sp, $sp, -4
+sw	$v0, 0($sp)
+li	$v0, 12
+syscall
+lw	$v0, 0($sp)
+addi	$sp, $sp, 4
+.end_macro
+
+
+.macro	print_char_r(%reg)
+	addi	$sp, $sp, -8
+	sw	$a0, 4($sp)
+	sw	$v0, 0($sp)
+	move	$a0, %reg
+	li	$v0, 11
+	syscall
+	lw	$a0, 4($sp)
+	lw	$v0, 0($sp)
+	addi	$sp, $sp, 8
+.end_macro
+
+.macro	print_str_r(%reg)
+	addi	$sp, $sp, -4
+	sw	$v0, 0($sp)
+	move	$a0, %reg
+	li	$v0, 4
+	syscall
+	lw	$v0, 0($sp)
+	addi	$sp, $sp, 4
+.end_macro	
+
+.macro print_str (%str)
+	addi	$sp, $sp, -4
+	sw	$v0, 0($sp)
+	.data
+myLabel: .asciiz %str
 	.text
-.align	2
+	li $v0, 4
+	la $a0, myLabel
+	syscall
+	lw	$v0, 0($sp)
+	addi	$sp, $sp, 4
+.end_macro
+
+.macro exit()
+	li	$v0, 10
+	syscall
+.end_macro
+
+.globl	strlen
+strlen:
+	li 	$t0, 0 # initialize the count to zero
+strlenLoop:
+	lbu 	$t1, 0($a0) # load the next character into t1
+	beqz 	$t1, exitStrlen # check for the null character
+	addi 	$a0, $a0, 1 # increment the string pointer
+	addi 	$t0, $t0, 1 # increment the count
+	j 	strlenLoop # return to the top of the loop
+	nop
+exitStrlen:
+	jr	$ra
+	move	$v0, $t0
+	
+.globl strcpy
+strcpy:
+	addi $sp, $sp, -4
+	sw $s0, 0($sp)	
+	add $s0, $zero, $zero
+strcpyL1: 
+	add $t1, $s0, $a1
+	lb $t2, 0($t1)
+	add $t3, $s0, $a0
+	sb $t2, 0($t3)
+	beq $t2, $zero, strcpyL2
+	j strcpyL1
+	addi $s0, $s0, 1
+strcpyL2: 	
+	lw $s0, 0($sp)
+	jr $ra
+	addi $sp, $sp, 4
+
 .globl	compare
 compare:
 	#.frame	$sp, 0, $ra		# vars= 0,  regs= 0/0,  args= 0,  gp= 0
 
-	j	$ra
+	jr	$ra
 	li	$v0, 1			# 0x1
 
 
-.align	2
 .globl	exchange
 exchange:
 	#.frame	$sp, 0, $ra		# vars= 0,  regs= 0/0,  args= 0,  gp= 0
@@ -61,11 +142,10 @@ exchange:
 	#nop
 	sb	$a1, 0($a0)
 	sb	$v1, 0($v0)
-	j	$ra
+	jr	$ra
 	li	$v0, 1			# 0x1
 
 	
-	.align	2
 	.globl	markTwo
 markTwo:
 	#.frame	$sp, 8, $ra		# vars= 0,  regs= 2/0,  args= 0,  gp= 0
@@ -96,11 +176,10 @@ okMarkTwo:
 	move	$v0, $zero
 	lw	$ra, 4($sp)
 	lw	$s0, 0($sp)
-	j	$ra
+	jr	$ra
 	addiu	$sp, $sp, 8
 
-	
-.align	2
+
 .globl	markInsert
 markInsert:
 	#.frame	$sp, 16, $ra		# vars= 0,  regs= 4/0,  args= 0,  gp= 0
@@ -173,34 +252,12 @@ okMarkInsert:
 	lw	$s2, 8($sp)
 	lw	$s1, 4($sp)
 	lw	$s0, 0($sp)
-	j	$ra
-	addiu	$sp, $sp, 16
-
-	
-	.align	2
-	.globl	getInput
-getInput:
-	#.frame	$sp, 16, $ra		# vars= 8,  regs= 1/0,  args= 0,  gp= 0
-	addiu	$sp, $sp, -16
-	sw	$ra, 12($sp)
-	move	$a0, $sp
-	lw	$a2, stdin
-	jal	fgets
-	li	$a1, 2			# 0x2
-
-	jal	clearStdinBuf
-	lb	$v0, 0($sp)
-	lw	$ra, 12($sp)
-	#nop
-	j	$ra
+	jr	$ra
 	addiu	$sp, $sp, 16
 
 
-	
-	
-	.text
-	.align	2
-	.globl	chooseExchangeMethod
+
+.globl	chooseExchangeMethod
 chooseExchangeMethod:
 	#.frame	$sp, 8, $ra		# vars= 0,  regs= 2/0,  args= 0,  gp= 0
 	addiu	$sp, $sp, -8
@@ -244,15 +301,12 @@ chooseExchangeMethod:
 .L36:
 	lw	$ra, 4($sp)
 	lw	$s0, 0($sp)
-	j	$ra
+	jr	$ra
 	addiu	$sp, $sp, 8
 
 	
 	
-	
-	.text
-	.align	2
-	.globl	rearrange
+.globl	rearrange
 rearrange:
 	#.frame	$sp, 56, $ra		# vars= 16,  regs= 10/0,  args= 0,  gp= 0
 	#.mask	0xc0ff0000, -4
@@ -302,7 +356,7 @@ noPrintManual:
 	print_str("\n")
 
 	addiu	$v0, $s0, -48		 # char - '0'
-	sltu	$v0, $v0, 10
+	sltiu	$v0, $v0, 10
 	beq	$v0, $zero, notANumber	 # not a number
 	move	$a0, $sp
 
@@ -315,7 +369,7 @@ noPrintManual:
 	nop
 notANumber:
 	li	$t0, 99		# 99 c
-	jal	$s0, $t0, compare
+	beq	$s0, $t0, compareBuffer
 	nop
 	li	$t0, 101
 	beq	$s0, $t0, endRearrange		# 101 e
@@ -328,6 +382,9 @@ notANumber:
 	nop
 	print_str("Invalid input\n")
 	j	inputLoop
+	nop
+compareBuffer:
+	jal	compare
 	nop
 chooseInputMethod:
 	jal	chooseExchangeMethod
@@ -342,100 +399,18 @@ endRearrange:
 	lw	$s1, 12($sp)
 	lw	$s0, 8($sp)
 	lw	$a1, 4($sp)
-	j	$ra
+	jr	$ra
 	addiu	$sp, $sp, 24
 
-.macro readChar
-addi	$sp, $sp, -4
-sw	$v0, $sp
-li	$v0, 12
-syscall
-lw	$v0, $sp
-addi	$sp, $sp, 4
-.end_macro
 
 
-.macro	print_char_r(%reg)
-	addi	$sp, $sp, -8
-	sw	$a0, 4($sp)
-	sw	$v0, 0($sp)
-	move	$a0, %reg
-	li	$v0, 11
-	syscall
-	lw	$a0, 4($sp)
-	lw	$v0, 0($sp)
-	addi	$sp, $sp, 8
-.end_macro
-
-.macro	print_str_r(%reg)
-	addi	$sp, $sp, -4
-	sw	$v0, $sp
-	move	$a0, %reg
-	li	$v0, 4
-	syscall
-	lw	$v0, $sp
-	addi	$sp, $sp, 4
-.end_macro	
-
-.macro print_str (%str)
-	addi	$sp, $sp, -4
-	sw	$v0, $sp
-	.data
-myLabel: .asciiz %str
-	.text
-	li $v0, 4
-	la $a0, myLabel
-	syscall
-	lw	$v0, $sp
-	addi	$sp, $sp, 4
-.end_macro
-
-.macro exit()
-	li	$v0, 10
-	syscall
-.end_macro
-
-.globl	strlen
-strlen:
-	li 	$t0, 0 # initialize the count to zero
-strlenLoop:
-	lbu 	$t1, 0($a0) # load the next character into t1
-	beqz 	$t1, exitStrlen # check for the null character
-	addi 	$a0, $a0, 1 # increment the string pointer
-	addi 	$t0, $t0, 1 # increment the count
-	j 	strlenLoop # return to the top of the loop
-	nop
-exitStrlen:
-	j	$ra
-	move	$v0, $t0
-	
-.globl strcpy
-strcpy:
-	addi $sp, $sp, -4
-	sw $s0, 0($sp)	
-	add $s0, $zero, $zero
-L1: 
-	add $t1, $s0, $a1
-	lb $t2, 0($t1)
-	add $t3, $s0, $a0
-	sb $t2, 0($t3)
-	beq $t2, $zero, L2
-	j L1
-	addi $s0, $s0, 1
-L2: 	
-	lw $s0, 0($sp)
-	jr $ra
-	addi $sp, $sp, 4
-				
-	.text
-	.align	2
-	.globl	main
+.globl	main
 main:
 	#.frame	$sp, 16, $ra		# vars= 0,  regs= 3/0,  args= 0,  gp= 0
 	addiu	$sp, $sp, -16
 	sw	$ra, 12($sp)
 	sw	$s1, 8($sp)
-	slt	$a0, $a0, 2
+	slti	$a0, $a0, 2
 	beq	$a0, $zero, valid
 	sw	$s0, 4($sp)
 
