@@ -156,16 +156,17 @@ markTwo:
 	sw	$ra, 4($sp)
 	sw	$s0, 0($sp)
 	move	$s0, $a0		# copy a0 to s0
-	lw	$a0, 0($a0)		# load data at address a0 to a0
-	li	$v0, -1			# 0xffffffffffffffff
+	
+	lw	$t0, 0($a0)		# load data at address a0 to t0
+	move	$a0, $t0		# may be used for markSecond
+	li	$t1, -1			
 	
 	addi	$a1, $a1, -48
-	beq	$a0, $v0, markFirst		# mark = -1, then goto markFirst
+	beq	$t0, $t1, markFirst		# mark = -1, then goto markFirst
 	
+	bne	$t0, $a1, markSecond		# mark and input are not equal
 	
-	bne	$a1, $a0, markSecond		# mark and input are not equal
-	
-	sw	$v0, 0($s0)
+	sw	$t1, 0($s0)
 	j	okMarkTwo		# if equal, then return and set mark = -1, which means unmark	
 
 markFirst:
@@ -174,8 +175,8 @@ markFirst:
 
 markSecond:
 	jal	exchange
-	li	$v0, -1			# 0xffffffffffffffff
-	sw	$v0, 0($s0)		# set mark to unmark (-1) after exchanging
+	li	$t0, -1
+	sw	$t0, 0($s0)		# set mark to unmark (-1) after exchanging
 okMarkTwo:
 	move	$v0, $zero
 	lw	$ra, 4($sp)
@@ -201,7 +202,6 @@ markInsert:
 	
 	sw	$v0, 0($s2)
 	j	okMarkInsert
-	
 
 markFirstInsert:
 	sw	$s1, 0($s2)
@@ -281,18 +281,18 @@ chooseExchangeMethod:
 	li	$t0, 50			# 0x32  2
 	bne	$v0, $t0, chooseMarkInsert
 	j	chooseOthers
-	nop
+	
 chooseMarkTwo:
 	la	$t1, markTwo
 	sw	$t1, exchangeFunc
-	j	endChoose
 	move	$v0, $zero
+	j	endChoose
 
 chooseOthers:
 	la	$t1, markInsert
 	sw	$t1, exchangeFunc
-	j	endChoose
 	move	$v0, $zero
+	j	endChoose
 
 chooseMarkInsert:
 	la	$t1, markTwo
@@ -300,8 +300,8 @@ chooseMarkInsert:
 	li	$v0, -1			# 0xffffffffffffffff
 endChoose:
 	lw	$ra, 0($sp)
-	jr	$ra
 	addi	$sp, $sp, 4
+	jr	$ra
 
 	
 	
