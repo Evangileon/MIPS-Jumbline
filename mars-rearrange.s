@@ -211,7 +211,6 @@ markSecondInsert:
 	bne	$t1, $zero, markLessThanInput	# mark =< input
 
 	slt	$t1, $s1, $s0		# compare input and mark				
-	addi	$s0, $s0, -1
 	bne	$t1, $zero, markLargerThanInput	# input <= mark
 	
 	li	$v0, -1
@@ -232,17 +231,21 @@ insertLoop:
 	beq	$v0, $zero, insertResetMark
 	addi	$s3, $s3, 1
 	j	insertLoop
-	
 
-insertSecondConditionLoop:
-	addi	$s0, $a0, -1
 markLargerThanInput:
+	slt	$t0, $s1, $s0
+	beq	$t0, $zero, insertResetMark
+	move	$s3, $s0
+	addi	$s1, $s1, 1
+secondInsertLoop:
+	move	$a0, $s3
+	addi	$a1, $s3, -1
 	jal	exchange
-	move	$a1, $s0
-
-	slt	$v0, $s1, $s0
-	bne	$v0, $zero, insertSecondConditionLoop
-	move	$a0, $s0
+	
+	slt	$t0, $s1, $s3
+	beq	$t0, $zero, insertResetMark
+	addi	$s3, $s3, -1
+	j	secondInsertLoop
 
 insertResetMark:
 	li	$t2, -1			# 0xffffffffffffffff
