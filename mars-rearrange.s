@@ -301,7 +301,7 @@ endChoose:
 	jr	$ra
 
 	
-	
+.globl rearrange	
 rearrange:
 	#.frame	$sp, 56, $ra		# vars= 16,  regs= 10/0,  args= 0,  gp= 0
 	#.mask	0xc0ff0000, -4
@@ -317,11 +317,11 @@ rearrange:
 	
 	li	$t1, -1
 	
-	addi	$s0, $sp, 4
+	move	$s0, $sp
 	move	$s0, $a0		# mark addr is $a0 and $s0, value is in $s3
 	move	$s1, $a1
 	move	$s3, $t1
-	sw	$s3, 0($s0)
+	sw	$t1, 0($sp)		# mark
 	la	$s2, buffer
 	
 inputLoop:
@@ -345,9 +345,11 @@ noPrintManual:
 	print_str("\n")
 	print_str("\n")
 
+	print_str("Please input a character: ")
+	
 	jal	read_char
 	move	$t0, $v0	# newly read char in t0
-	
+	print_str("\n")
 
 	print_str("Input: ")
 	print_char_r($t0)
@@ -357,7 +359,7 @@ noPrintManual:
 	sltiu	$v0, $v0, 10
 	beq	$v0, $zero, notANumber	 # not a number
 	
-	move	$a0, $s0	# addr of mark
+	move	$a0, $sp	# addr of mark
 	move	$a1, $t0
 	lw	$v0, exchangeFunc
 	jalr	$v0
