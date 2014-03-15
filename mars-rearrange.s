@@ -89,6 +89,7 @@ myLabel: .asciiz %str
 .end_macro
 
 
+
 .globl main
 
 strlen:
@@ -184,20 +185,21 @@ okMarkTwo:
 
 markInsert:
 	#.frame	$sp, 16, $ra		# vars= 0,  regs= 4/0,  args= 0,  gp= 0
-	addi	$sp, $sp, -16
-	sw	$ra, 12($sp)
+	addi	$sp, $sp, -20
+	sw	$ra, 16($sp)
+	sw	$s3, 12($sp)
 	sw	$s2, 8($sp)
 	sw	$s1, 4($sp)
 	sw	$s0, 0($sp)
-	move	$s2, $a0		# mark status is on a0 and s2
-	lw	$a0, 0($a0)
-	li	$v0, -1			# 0xffffffffffffffff
+	move	$s2, $a0		# mark status address is on s2
+	lw	$s0, 0($s2)		# mark value in s0
+	li	$t0, -1			# 0xffffffffffffffff
 	addi	$s1, $a1, -48			# s1 is the index repre of input
-	beq	$a0, $v0, markFirstInsert		# mark = -1, then mark first
+	beq	$s0, $t0, markFirstInsert		# mark = -1, then mark first
 	
-	bne	$s1, $a0, markSecondInsert	# mark and input are not equal
+	bne	$s1, $s0, markSecondInsert	# mark and input are not equal
 	
-	sw	$v0, 0($s2)
+	sw	$t0, 0($s2)
 	j	okMarkInsert
 
 markFirstInsert:
@@ -205,33 +207,32 @@ markFirstInsert:
 	j	okMarkInsert
 
 markSecondInsert:
-	slt	$v0, $a0, $s1		# compare mark and input
-	bne	$v0, $zero, markLessThanInput	# mark =< input
-	slt	$v0, $s1, $a0		# compare input and mark
-					
-	bne	$v0, $zero, markLargerThanInput	# input <= mark
-	addi	$s0, $a0, -1
+	slt	$t1, $s0, $s1		# compare mark and input
+	bne	$t1, $zero, markLessThanInput	# mark =< input
 
+	slt	$t1, $s1, $s0		# compare input and mark				
+	addi	$s0, $s0, -1
+	bne	$t1, $zero, markLargerThanInput	# input <= mark
+	
+	li	$v0, -1
 	j	endInsertLoop			# end
-	li	$v0, -1			# 0xffffffffffffffff
 
 markLessThanInput:
 	addi	$s1, $s1, -1
-	slt	$v0, $a0, $s1
-	beq	$v0, $zero, endInsertLoop
-	li	$v0, -1			# 0xffffffffffffffff
-
-	addi	$s0, $a0, 1
+	slt	$t0, $s0, $s1
+	beq	$t0, $zero, insertResetMark
+	move	$s3, $s0
+	addi	$s1, $s1, -1
 insertLoop:
+	move	$a0, $s3
+	addi	$a1, $s3, 1
 	jal	exchange
-	move	$a1, $s0
-
-	slt	$v0, $s0, $s1
+	
+	slt	$v0, $s3, $s1
 	beq	$v0, $zero, insertResetMark
-	move	$a0, $s0
-
+	addi	$s3, $s3, 1
 	j	insertLoop
-	addi	$s0, $a0, 1
+	
 
 insertSecondConditionLoop:
 	addi	$s0, $a0, -1
@@ -244,18 +245,20 @@ markLargerThanInput:
 	move	$a0, $s0
 
 insertResetMark:
-	li	$v0, -1			# 0xffffffffffffffff
+	li	$t2, -1			# 0xffffffffffffffff
+	sw	$t2, 0($s2)
 endInsertLoop:
-	sw	$v0, 0($s2)
+	nop
 okMarkInsert:
 	move	$v0, $zero
-	lw	$ra, 12($sp)
+	lw	$ra, 16($sp)
+	lw	$s3, 12($sp)
 	lw	$s2, 8($sp)
 	lw	$s1, 4($sp)
 	lw	$s0, 0($sp)
+	addi	$sp, $sp, 20
 	jr	$ra
-	addi	$sp, $sp, 16
-
+	
 
 
 chooseExchangeMethod:
@@ -267,11 +270,14 @@ chooseExchangeMethod:
 	print_str("1 to markTwo\n")
 	print_str("2 to markInsert\n")
 	
+	print_str("Select method: ")
 	jal	read_char
-	
+	print_str("\n")
 	#move	$s0, $v0
 	
+	print_str("Method ")
 	print_char_r($v0)
+	print_str("\n")
 
 	li	$t0, 49			# 0x31  1
 	beq	$v0, $t0, chooseMarkTwo
@@ -317,7 +323,7 @@ rearrange:
 	
 	li	$t1, -1
 	
-	move	$s0, $sp
+	#move	$s0, $sp
 	move	$s0, $a0		# mark addr is $a0 and $s0, value is in $s3
 	move	$s1, $a1
 	move	$s3, $t1
@@ -348,19 +354,19 @@ noPrintManual:
 	print_str("Please input a character: ")
 	
 	jal	read_char
-	move	$t0, $v0	# newly read char in t0
+	move	$s5, $v0	# newly read char in t0
 	print_str("\n")
 
 	print_str("Input: ")
-	print_char_r($t0)
+	print_char_r($s5)
 	print_str("\n")
 
-	addi	$v0, $v0, -48		 # char - '0'
+	addi	$v0, $s5, -48		 # char - '0'
 	sltiu	$v0, $v0, 10
 	beq	$v0, $zero, notANumber	 # not a number
 	
 	move	$a0, $sp	# addr of mark
-	move	$a1, $t0
+	move	$a1, $s5
 	lw	$v0, exchangeFunc
 	jalr	$v0
 	
@@ -368,16 +374,16 @@ noPrintManual:
 
 notANumber:
 	li	$t3, 99		# 99 c
-	beq	$t3, $t0, compareBuffer
+	beq	$t3, $s5, compareBuffer
 	
 	li	$t3, 101
-	beq	$t3, $t0, endRearrange		# 101 e
+	beq	$t3, $s5, endRearrange		# 101 e
 	
 	li	$t3, 109			# 109 m
-	beq	$t3, $t0, chooseInputMethod
+	beq	$t3, $s5, chooseInputMethod
 	
 	li	$t3, 120		# 120 x
-	beq	$t3, $t0, endRearrange
+	beq	$t3, $s5, endRearrange
 	
 	print_str("Invalid input\n")
 	j	inputLoop
@@ -385,17 +391,19 @@ notANumber:
 compareBuffer:
 	jal	compare
 chooseInputMethod:
+	li	$t7, -1
+	sw	$t7, 0($sp)	
 	jal	chooseExchangeMethod
 	j	inputLoop
 endRearrange:
 	li	$v0, 1			# 0x1
-	sw	$ra, 24($sp)
-	sw	$s3, 20($sp)
-	sw	$s2, 16($sp)
-	sw	$s1, 12($sp)
-	sw	$s0, 8($sp)
-	sw	$v0, 4($sp)
-	addi	$sp, $sp, 24
+	lw	$ra, 24($sp)
+	lw	$s3, 20($sp)
+	lw	$s2, 16($sp)
+	lw	$s1, 12($sp)
+	lw	$s0, 8($sp)
+	lw	$v0, 4($sp)
+	addi	$sp, $sp, 28
 	jr	$ra
 
 
