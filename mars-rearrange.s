@@ -1,37 +1,11 @@
 
 .data
 .align	2
-.LC0:
-	.ascii	"Select the method:\000"
-.LC1:
-	.ascii	"1 to markTwo\000"
-.LC2:
-	.ascii	"2 to markInsert\000"
-.LC3:
-	.ascii	"Choose %c\012\000"
-.LC4:
-	.ascii	"Input the index of the char you want to exchange\000"
-.LC5:
-	.ascii	"\012Or choose option:\000"
-.LC6:
-	.ascii	"x to exit the program\000"
-.LC7:
-	.ascii	"m to choose exchange method\000"
-.LC8:
-	.ascii	"c to compare the string with list\000"
-.LC9:
-	.ascii	"\011\011%s\012\000"
-.LC10:
-	.ascii	"Input: %c\012\000"
-.LC11:
-	.ascii	"newline\000"
-.LC12:
-	.ascii	"Invalid input\000"
-sInputFormat:
-	.ascii	"Input format: ./rearrange {WORD}\012\000"
 
-.globl	exchangeFunc
-	.data
+
+.globl	exchangeFunc		# This word used to store the address of the exchange method 
+				#and the function to selecr substring to compare
+.data
 exchangeFunc:
 	.word	markTwo
 numChars:
@@ -309,6 +283,49 @@ endChoose:
 	addi	$sp, $sp, 4
 	jr	$ra
 
+
+substringToCompare:
+	#.frame	$sp, 8, $ra		# vars= 0,  regs= 2/0,  args= 0,  gp= 0
+	addi	$sp, $sp, -8		# a0 is mark status, a1 is the input
+	sw	$ra, 4($sp)
+	sw	$s0, 0($sp)
+	move	$s0, $a0		# copy a0 to s0
+	
+	lw	$t0, 0($a0)		# load data at address a0 to t0
+	move	$a0, $t0		# may be used for markSecond
+	li	$t1, -1			
+	
+	addi	$a1, $a1, -48
+	beq	$t0, $t1, substringMarkFirst		# mark = -1, then goto markFirst
+	
+	bne	$t0, $a1, subtringMarkSecond		# mark and input are not equal
+	
+	sw	$t1, 0($s0)
+	j	okSubstringMarkTwo		# if equal, then return and set mark = -1, which means unmark	
+substringMarkFirst:
+	sw	$a1, 0($s0)
+	j	okSubstringMarkTwo	
+subtringMarkSecond:
+	move	$a0, $t0
+	move	$a1, $a1
+	jal	exchangeFunc
+	li	$t0, -1
+	sw	$t0, 0($s0)		# set mark to unmark (-1) after exchanging
+okSubstringMarkTwo:
+	move	$v0, $zero
+	lw	$ra, 4($sp)
+	lw	$s0, 0($sp)
+	addi	$sp, $sp, 8
+	jr	$ra
+
+
+selectSubstringOption:
+#.frame	$sp, 8, $ra		# vars= 0,  regs= 2/0,  args= 0,  gp= 0
+	la	$t1, substringToCompare
+	sw	$t1, exchangeFunc
+	print_str("Switch to substring mode\n")
+	jr	$ra
+
 	
 .globl rearrange	
 rearrange:
@@ -385,6 +402,9 @@ notANumber:
 	li	$t3, 109			# 109 m
 	beq	$t3, $s5, chooseInputMethod
 	
+	li	$t3, 113			# 115 s
+	beq	$t3, $s5, chooseSubstring
+	
 	li	$t3, 120		# 120 x
 	beq	$t3, $s5, endRearrange
 	
@@ -397,6 +417,11 @@ chooseInputMethod:
 	li	$t7, -1
 	sw	$t7, 0($sp)	
 	jal	chooseExchangeMethod
+	j	inputLoop	
+chooseSubstring:
+	li	$t7, -1
+	sw	$t7, 0($sp)
+	jal	selectSubstringOption
 	j	inputLoop
 endRearrange:
 	li	$v0, 1			# 0x1
