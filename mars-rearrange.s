@@ -13,7 +13,7 @@ numChars:
 buffer:
 	.space	16
 compareBuffer:
-	.space
+	.space	16
 
 .text
 
@@ -101,10 +101,36 @@ strcpyL2:
 
 .globl	compare
 compare:
-	#.frame	$sp, 0, $ra		# vars= 0,  regs= 0/0,  args= 0,  gp= 0
-
+	addi	$sp, $sp, -12
+	sw	$ra, 8($sp)
+	sw	$s1, 4($sp)
+	sw	$s0, 0($sp)
+		
+	sub	$s1, $a1, $a0			# length
+	slt	$t0, $a0, $a1
+	bne	$t1, $zero, readyToCompare
+	
+	move	$t2, $a0			# if a0 smaller than a1, then do swap
+	move	$a0, $a1,
+	move	$a1, $t2
+	
+readyToCompare:
+	move	$a2, $a0
+	move	$a3, $a1
+	addi	$a3, $a3, 1
+	la	$a0, compareBuffer
+	la	$a1, buffer
+	jal	substringCpy
+	
+	la	$s0, compareBuffer
+	
+	
+	lw	$ra, 8($sp)
+	lw	$s1, 4($sp)
+	lw	$s0, 0($sp)
+	addi	$sp, $sp, 12
 	jr	$ra
-	li	$v0, 1			# 0x1
+	
 
 
 .globl	exchange
@@ -123,15 +149,15 @@ exchange:
 	
 
 substringCpy:				# a0 dest, a1, src, a2 start, a3 end(exclusive)
-	sub	$t0, $a2, $a3		# length
-	add	$t1, $a1, $zero
-	add	$t2, $a0, $a2		# start address
-	add	$t3, $a0, $a3
+	sub	$t0, $a3, $a2		# length
+	add	$t1, $a0, $zero
+	add	$t2, $a1, $a2		# start address of src
+	add	$t3, $a1, $a3		# end address of src
 substrCpyLoop:
 	lb	$t4, 0($t2)
 	sb	$t4, 0($t1)
-	addi	$t2, 1
-	addi	$t1, 1
+	addi	$t2, $t2, 1
+	addi	$t1, $t1, 1
 	bne	$t2, $t3, substrCpyLoop
 	
 	jr	$ra
@@ -408,7 +434,7 @@ noPrintManual:
 
 notANumber:
 	li	$t3, 99		# 99 c
-	beq	$t3, $s5, compareBuffer
+	beq	$t3, $s5, compareBufferAll
 	
 	li	$t3, 101
 	beq	$t3, $s5, endRearrange		# 101 e
@@ -425,7 +451,7 @@ notANumber:
 	print_str("Invalid input\n")
 	j	inputLoop
 	
-compareBuffer:
+compareBufferAll:
 	li	$t7, -1
 	sw	$t7, 0($sp)
 	jal	compare
