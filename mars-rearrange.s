@@ -12,6 +12,8 @@ numChars:
 	.word	7
 buffer:
 	.space	16
+compareBuffer:
+	.space
 
 .text
 
@@ -120,8 +122,22 @@ exchange:
 	jr	$ra
 	
 
+substringCpy:				# a0 dest, a1, src, a2 start, a3 end(exclusive)
+	sub	$t0, $a2, $a3		# length
+	add	$t1, $a1, $zero
+	add	$t2, $a0, $a2		# start address
+	add	$t3, $a0, $a3
+substrCpyLoop:
+	lb	$t4, 0($t2)
+	sb	$t4, 0($t1)
+	addi	$t2, 1
+	addi	$t1, 1
+	bne	$t2, $t3, substrCpyLoop
 	
-	.globl	markTwo
+	jr	$ra
+	
+	
+.globl	markTwo
 markTwo:
 	#.frame	$sp, 8, $ra		# vars= 0,  regs= 2/0,  args= 0,  gp= 0
 	addi	$sp, $sp, -8		# a0 is mark status, a1 is the input
