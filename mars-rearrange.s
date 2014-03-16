@@ -308,7 +308,7 @@ substringMarkFirst:
 subtringMarkSecond:
 	move	$a0, $t0
 	move	$a1, $a1
-	jal	exchangeFunc
+	jal	compare
 	li	$t0, -1
 	sw	$t0, 0($s0)		# set mark to unmark (-1) after exchanging
 okSubstringMarkTwo:
@@ -352,17 +352,15 @@ rearrange:
 	
 inputLoop:
 	
-	bne	$s3, $t1, noPrintManual		# mark = -1?
+	#bne	$s3, $t1, noPrintManual		# mark = -1?
 	
 	print_str("\n")
-
-	print_str("Input the index of the char you want to exchange")
-	print_str_r($s2)	# print buffer
-	
-	print_str("\012Or choose option:\n")
+	print_str("Input the index of the char you want to exchange\n")
+	print_str("Choose option:\n")
 	print_str("x to exit the program\n")
 	print_str("m to choose exchange method\n")
 	print_str("c to compare the string with list\n")
+	print_str("s to select the substring to compare with dictionary\n")
 
 noPrintManual:
 	print_str("\n")
@@ -402,7 +400,7 @@ notANumber:
 	li	$t3, 109			# 109 m
 	beq	$t3, $s5, chooseInputMethod
 	
-	li	$t3, 113			# 115 s
+	li	$t3, 115			# 115 s
 	beq	$t3, $s5, chooseSubstring
 	
 	li	$t3, 120		# 120 x
@@ -412,6 +410,8 @@ notANumber:
 	j	inputLoop
 	
 compareBuffer:
+	li	$t7, -1
+	sw	$t7, 0($sp)
 	jal	compare
 chooseInputMethod:
 	li	$t7, -1
