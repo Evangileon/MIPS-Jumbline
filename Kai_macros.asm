@@ -35,7 +35,7 @@ syscall
 li $a0,60
 li $a1,1000
 li $a2,0
-li $a3,100
+li $a3,30
 li $v0,31
 syscall
 .end_macro
@@ -50,6 +50,19 @@ syscall
 .end_macro 
 ##########################################################################
 .macro display() #display the current status of remaining words list
+addi $sp,$sp,-20
+sw $s0,($sp)
+sw $s1,4($sp)
+sw $s2,8($sp)
+sw $s3,12($sp)
+sw $s4,16($sp)
+
+la $s0,LIST
+la $s1,LISTSZ
+la $s2,COUNT
+la $s3, HITLIST
+la $s4, HITLISTSZ
+
 print_str("The remaining words: ")
 lw $t0,($s1)
 print_int($t0)
@@ -72,9 +85,29 @@ print_str("\n")
 addi $t0,$t0,1
 li $t1,7
 bge $t1,$t0,L0OP
+
+lw $s0,($sp)
+lw $s1,4($sp)
+lw $s2,8($sp)
+lw $s3,12($sp)
+lw $s4,16($sp)
+addi $sp,$sp,20
 .end_macro
 ################################################################################
 .macro summary(%a)  #read from ArrayOfString and make a answer list
+addi $sp,$sp,-20
+sw $s0,($sp)
+sw $s1,4($sp)
+sw $s2,8($sp)
+sw $s3,12($sp)
+sw $s4,16($sp)
+
+la $s0,LIST
+la $s1,LISTSZ
+la $s2,COUNT
+la $s3, HITLIST
+la $s4, HITLISTSZ
+
 addi $sp,$sp,-4
 sw $s0,($sp)
 L1:
@@ -114,18 +147,37 @@ lw $s0,0($sp)
 addi $sp,$sp,4
 # display the current status of the LIST and HITLIST
 display() # display LISTSZ, HITLISTSZ, COUNT
+lw $s0,($sp)
+lw $s1,4($sp)
+lw $s2,8($sp)
+lw $s3,12($sp)
+lw $s4,16($sp)
+addi $sp,$sp,20
 .end_macro 
 ########################################################################################################################
 .macro check(%candidate,%length) # check if the user has made a repeated guess, if non-repeated return 1, else return 0
+addi $sp,$sp,-20
+sw $s0,($sp)
+sw $s1,4($sp)
+sw $s2,8($sp)
+sw $s3,12($sp)
+sw $s4,16($sp)
+
+la $s0,LIST
+la $s1,LISTSZ
+la $s2,COUNT
+la $s3, HITLIST
+la $s4, HITLISTSZ
+
 addi $sp,$sp,-12
 sw %candidate,($sp) # store $a0
 sw %length,4($sp)
 sw $s3,8($sp) # store $s3
-lw $s5,($s4) # $s5:HITLISTSZ
-lw $s6,(%length) # length of CANDIDATE
+lw $t5,($s4) # $t5:HITLISTSZ
+lw $t6,(%length) # $t6:length of CANDIDATE
 li $t0,1 # $t0:word iterator in the HITLIST
 L3:
-bgt $t0,$s5,EXIT # if reach the end of HITLIST,break
+bgt $t0,$t5,EXIT # if reach the end of HITLIST,break
 lw %candidate,($sp)  # $a0:char iterator in candidate word
 li $t1,0     # $t1:match char counter in a word
 move $t2,$s3 # $t2:char iterator in a word
@@ -133,7 +185,7 @@ L4:
 lb $t3,($t2) 
 lb $t4,(%candidate)
 bne $t3,$t4,NEXT #if char not match, check the next entry in the HITLIST
-beq $t1,$s6,REPEAT #if all chars match, break, print error message
+beq $t1,$t6,REPEAT #if all chars match, break, print error message
 addi $t1,$t1,1
 addi $t2,$t2,1
 addi %candidate,%candidate,1
@@ -154,19 +206,42 @@ lw %candidate,($sp)
 lw %length,4($sp)
 lw $s3,8($sp)
 addi $sp,$sp,12
+
+
+lw $s0,($sp)
+lw $s1,4($sp)
+lw $s2,8($sp)
+lw $s3,12($sp)
+lw $s4,16($sp)
+addi $sp,$sp,20
 .end_macro
 ####################################################################################################################
 .macro search(%candidate,%length)  #search the candidate in answer list, if guess correct return 1, else return 0
+addi $sp,$sp,-20
+sw $s0,($sp)
+sw $s1,4($sp)
+sw $s2,8($sp)
+sw $s3,12($sp)
+sw $s4,16($sp)
+
+la $s0,LIST
+la $s1,LISTSZ
+la $s2,COUNT
+la $s3, HITLIST
+la $s4, HITLISTSZ
+
+
 addi $sp,$sp,-16
 sw %candidate,($sp)
 sw %length,4($sp)
 sw $s0,8($sp)
 sw $s3,12($sp)
 li $t0,1 #  $t0:word iterator in the list
-lw $s5,($s1) # $s5:LISTSZ
+lw $t5,($s1) # $t5:LISTSZ
+lw $t6,(%length) # $t6:length of CANDIDATE
 lw $s0,8($sp) # $s0:LIST address
 L5:
-bgt $t0,$s5,QUIT # if reach the end of LIST,break
+bgt $t0,$t5,QUIT # if reach the end of LIST,break
 lw %candidate,($sp) # $a0:char iterator in candidate word
 li $t1,0 # $t1:match alphabet counter
 move $t2,$s0 # $t2:character iterator in a word 
@@ -174,7 +249,7 @@ L6:
 lb $t3,($t2)
 lb $t4,(%candidate)
 bne $t3,$t4,CHECK_NEXT # if char does not match, break L6 and move to the next word 
-beq $t1,$s6,STORE # if all chars match, break L5 and store the word in HITLIST
+beq $t1,$t6,STORE # if all chars match, break L5 and store the word in HITLIST
 addi $t1,$t1,1
 addi $t2,$t2,1
 addi %candidate,%candidate,1
@@ -208,7 +283,7 @@ lw $t0,($s4)
 addi $t0,$t0,1
 sw $t0,($s4)
 # COUNT[length]--
-move $t0,$s6
+move $t0,$t6
 subi $t1,$t0,2
 sll $t1,$t1,2
 add $t1,$t1,$s2
@@ -228,15 +303,17 @@ lw %length,4($sp)
 lw $s0,8($sp)
 lw $s3,12($sp)
 addi $sp,$sp,16
+
+lw $s0,($sp)
+lw $s1,4($sp)
+lw $s2,8($sp)
+lw $s3,12($sp)
+lw $s4,16($sp)
+addi $sp,$sp,20
 .end_macro 
 ################################################################3
 
 main:
-la $s0,LIST
-la $s1,LISTSZ
-la $s2,COUNT
-la $s3, HITLIST
-la $s4, HITLISTSZ
 
 # receive ArrayOfString and generate LIST of all possible answers
 la $a0,ArrayOfString
