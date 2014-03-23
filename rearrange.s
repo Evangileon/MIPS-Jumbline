@@ -1,4 +1,4 @@
-	.file	1 "rearrange.c"
+	.file	1 "rearrange.c" #import the rearrange file and it is written in c
 	.section .mdebug.eabi32
 	.previous
 	.section .gcc_compiled_long32
@@ -29,6 +29,9 @@ compare:
 	.set	nomips16
 	.ent	exchange
 	.type	exchange, @function
+	
+#compare to the dictionary and see if the rearranged word is in the dictionary
+
 exchange:
 	.frame	$sp,0,$31		# vars= 0, regs= 0/0, args= 0, gp= 0
 	.mask	0x00000000,0
@@ -57,6 +60,9 @@ exchange:
 	.set	nomips16
 	.ent	markTwo
 	.type	markTwo, @function
+
+#when you exchange the order of the characters, you store the charcters into the correct registers
+
 markTwo:
 	.frame	$sp,8,$31		# vars= 0, regs= 2/0, args= 0, gp= 0
 	.mask	0x80010000,-4
@@ -105,6 +111,8 @@ markTwo:
 	.set	nomips16
 	.ent	markInsert
 	.type	markInsert, @function
+	
+	
 markInsert:
 	.frame	$sp,16,$31		# vars= 0, regs= 4/0, args= 0, gp= 0
 	.mask	0x80070000,-4
