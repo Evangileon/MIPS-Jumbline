@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os, sys
+
 usage = "usage: %s search_text replace_text [infile [outfile]]" % os.path.basename(sys.argv[0])
 
 mapping = [ ('$0', '$zero'), ('$1', '$at'), ('$2', '$v0'), ('$3', '$v1'),
@@ -12,10 +13,15 @@ mapping = [ ('$0', '$zero'), ('$1', '$at'), ('$2', '$v0'), ('$3', '$v1'),
             ('$24', '$t9'),  ('$25', '$t9'),  ('$26', '$k0'),  ('$27', '$k1'),
             ('$28', '$gp'),  ('$29', '$sp'),  ('$30', '$fp'),  ('$31', '$ra') ]
 
+#mapping is to list all the registers, and what is the decimal value
 
 input = open(sys.argv[1])
 
+#open the system file and fin dout the first argument
+
 output = open(sys.argv[2], 'w')
+
+#open the second file and use 'w' to divide it
 
 for my_string in input:
     if not ".set" in my_string:
@@ -23,6 +29,8 @@ for my_string in input:
             my_string = my_string.replace(k, v)
         my_string = my_string.replace(',', ', ')
         output.write(my_string)
+        
+#store each character into one register
 
 input.close()
 output.close()
