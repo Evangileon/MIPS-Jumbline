@@ -50,6 +50,9 @@ syscall
 .end_macro 
 ##########################################################################
 .macro display() #display the current status of remaining words list
+addi	$sp, $sp, -8
+sw	$s4, 4($sp)
+sw	$s0, 0($sp)
 print_str("The remaining words: ")
 lw $t0,($s1)
 print_int($t0)
@@ -72,11 +75,16 @@ print_str("\n")
 addi $t0,$t0,1
 li $t1,7
 bge $t1,$t0,L0OP
+
+lw	$s4, 4($sp)
+lw	$s0, 0($sp)
+addi	$sp, $sp, 8
 .end_macro
 ################################################################################
 .macro summary(%a)  #read from ArrayOfString and make a answer list
-addi $sp,$sp,-4
-sw $s0,($sp)
+addi 	$sp,$sp,-8
+sw	$s2, 4($sp)
+sw 	$s0, 0($sp)
 L1:
 move $t0,%a  # $t0:iterator of char in a word; $a0:iterator of ArrayOfString
 move $t1,$s0  # $s1: list address
@@ -110,17 +118,20 @@ beq $t1,$zero,END
 j L1
 END:
  #restore old $a0,$s0,$s1,$s2
-lw $s0,0($sp)
-addi $sp,$sp,4
+lw 	$s2, 4($sp)
+lw 	$s0,0($sp)
+addi $sp,$sp,8
 # display the current status of the LIST and HITLIST
 display() # display LISTSZ, HITLISTSZ, COUNT
 .end_macro 
 ########################################################################################################################
 .macro check(%candidate,%length) # check if the user has made a repeated guess, if non-repeated return 1, else return 0
-addi $sp,$sp,-12
+addi $sp,$sp,-20
 sw %candidate,($sp) # store $a0
 sw %length,4($sp)
 sw $s3,8($sp) # store $s3
+sw	$s5, 12($sp)
+sw	$s6, 16($sp)
 lw $s5,($s4) # $s5:HITLISTSZ
 lw $s6,(%length) # length of CANDIDATE
 li $t0,1 # $t0:word iterator in the HITLIST
@@ -152,16 +163,24 @@ li $v0,1
 nonrepeat:
 lw %candidate,($sp)  
 lw %length,4($sp)
+sw	$s5, 12($sp)
+sw	$s6, 16($sp)
 lw $s3,8($sp)
-addi $sp,$sp,12
+addi $sp,$sp,20
 .end_macro
 ####################################################################################################################
 .macro search(%candidate,%length)  #search the candidate in answer list, if guess correct return 1, else return 0
-addi $sp,$sp,-16
-sw %candidate,($sp)
-sw %length,4($sp)
-sw $s0,8($sp)
-sw $s3,12($sp)
+addi 	$sp, $sp, -36
+sw 	%candidate,($sp)
+sw 	%length,4($sp)
+sw 	$s0, 8($sp)
+sw	$s1, 12($sp)
+sw	$s2, 16($sp)
+sw 	$s3, 20($sp)
+sw	$s4, 24($sp)
+sw	$s5, 28($sp)
+sw	$s6, 32($sp)
+
 li $t0,1 #  $t0:word iterator in the list
 lw $s5,($s1) # $s5:LISTSZ
 lw $s0,8($sp) # $s0:LIST address
@@ -223,30 +242,19 @@ QUIT:
 print_str("Sorry, wrong guess!")
 li $v0,0
 incorrect:
-lw %candidate,($sp)
-lw %length,4($sp)
-lw $s0,8($sp)
-lw $s3,12($sp)
-addi $sp,$sp,16
+sw 	%candidate,($sp)
+sw 	%length,4($sp)
+sw 	$s0, 8($sp)
+sw	$s1, 12($sp)
+sw	$s2, 16($sp)
+sw 	$s3, 20($sp)
+sw	$s4, 24($sp)
+sw	$s5, 28($sp)
+sw	$s6, 32($sp)
+addi 	$sp,$sp, 36
 .end_macro 
 ################################################################3
 
-main:
-la $s0,LIST
-la $s1,LISTSZ
-la $s2,COUNT
-la $s3, HITLIST
-la $s4, HITLISTSZ
-
-# receive ArrayOfString and generate LIST of all possible answers
-la $a0,ArrayOfString
-summary($a0)
-
-# Check if the user made a repeated candidate input and search the candidate input in LIST
-la $a0,CANDIDATE
-la $a1,CANDIDATE_LENGTH
-check($a0,$a1)
-search($a0,$a1)
 
 
 
