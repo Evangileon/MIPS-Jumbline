@@ -1,7 +1,8 @@
 
+.include "./Kai_macro.asm"
+
 .data
 .align	2
-
 
 .globl	exchangeFunc		# This word used to store the address of the exchange method 
 				#and the function to selecr substring to compare
