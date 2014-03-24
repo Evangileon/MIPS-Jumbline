@@ -13,7 +13,7 @@ static int numChars = 7;
 
 //int mark = -1;
 //int mark2 = -1;
-
+//what we do with the marks here?
 void clearStdinBuf() {
     int c;
     while((c = getchar()) != '\n' && c != EOF);
