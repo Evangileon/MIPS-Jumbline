@@ -14,10 +14,11 @@ mapping = [ ('$0', '$zero'), ('$1', '$at'), ('$2', '$v0'), ('$3', '$v1'),
             ('$28', '$gp'),  ('$29', '$sp'),  ('$30', '$fp'),  ('$31', '$ra') ]
 
 #mapping is to list all the registers, and what is the decimal value
+#this mapping will be the indexing for the array when we put the word into an array
 
 input = open(sys.argv[1])
 
-#open the system file and fin dout the first argument
+#open the system file and find out the first argument
 
 output = open(sys.argv[2], 'w')
 
