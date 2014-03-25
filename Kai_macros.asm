@@ -255,6 +255,22 @@ addi 	$sp,$sp, 36
 .end_macro 
 ################################################################3
 
+#main:
+la $s0,LIST
+la $s1,LISTSZ
+la $s2,COUNT
+la $s3, HITLIST
+la $s4, HITLISTSZ
+
+# receive ArrayOfString and generate LIST of all possible answers
+la $a0,ArrayOfString
+summary($a0)
+
+# Check if the user made a repeated candidate input and search the candidate input in LIST
+la $a0,CANDIDATE
+la $a1,CANDIDATE_LENGTH
+check($a0,$a1)
+search($a0,$a1)
 
 
 

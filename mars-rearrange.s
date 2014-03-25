@@ -1,5 +1,5 @@
 
-.include "./Kai_macro.asm"
+.include "Kai_macro.asm"
 
 .data
 .align	2
@@ -37,15 +37,15 @@ read_char:
 	addi	$sp, $sp, 8
 .end_macro
 
-.macro	print_str_r(%reg)
-	addi	$sp, $sp, -4
-	sw	$v0, 0($sp)
-	move	$a0, %reg
-	li	$v0, 4
-	syscall
-	lw	$v0, 0($sp)
-	addi	$sp, $sp, 4
-.end_macro	
+#.macro	print_str_r(%reg)
+#	addi	$sp, $sp, -4
+#	sw	$v0, 0($sp)
+#	move	$a0, %reg
+#	li	$v0, 4
+#	syscall
+#	lw	$v0, 0($sp)
+#	addi	$sp, $sp, 4
+#.end_macro	
 
 .macro print_str (%str)
 	addi	$sp, $sp, -4
@@ -124,8 +124,8 @@ readyToCompare:
 	jal	substringCpy
 	
 	la	$s0, compareBuffer
-	
-	
+	check($s0, $s1)
+	search($s0, $s1)
 	lw	$ra, 8($sp)
 	lw	$s1, 4($sp)
 	lw	$s0, 0($sp)
