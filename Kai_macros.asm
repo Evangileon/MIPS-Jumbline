@@ -313,7 +313,7 @@ addi $sp,$sp,20
 .end_macro 
 ################################################################3
 
-main:
+#main:
 
 # receive ArrayOfString and generate LIST of all possible answers
 la $a0,ArrayOfString
