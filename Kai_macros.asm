@@ -134,9 +134,11 @@ sw	$s5, 12($sp)
 sw	$s6, 16($sp)
 lw $s5,($s4) # $s5:HITLISTSZ
 lw $s6,(%length) # length of CANDIDATE
-li $t0,1 # $t0:word iterator in the HITLIST
+######  li $t0,1 # $t0:word iterator in the HITLIST  
+######  la $t0, Buffer ######
+######  move $s5, $v0  ######
 L3:
-bgt $t0,$s5,EXIT # if reach the end of HITLIST,break
+###### bgt $s3,$s5,EXIT # if reach the end of HITLIST,break
 lw %candidate,($sp)  # $a0:char iterator in candidate word
 li $t1,0     # $t1:match char counter in a word
 move $t2,$s3 # $t2:char iterator in a word
@@ -151,7 +153,7 @@ addi %candidate,%candidate,1
 j L4
 NEXT:
 addi $s3,$s3,8
-addi $t0,$t0,1
+###### addi $t0,$t0,1 ######
 j L3
 REPEAT:
 print_str ("\nInvalid Guess!\n")
@@ -163,8 +165,8 @@ li $v0,1
 nonrepeat:
 lw %candidate,($sp)  
 lw %length,4($sp)
-sw	$s5, 12($sp)
-sw	$s6, 16($sp)
+lw	$s5, 12($sp)
+lw	$s6, 16($sp)
 lw $s3,8($sp)
 addi $sp,$sp,20
 .end_macro
