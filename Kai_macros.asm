@@ -156,43 +156,31 @@ addi $sp,$sp,20
 .end_macro 
 ########################################################################################################################
 .macro check(%candidate,%length) # check if the user has made a repeated guess, if non-repeated return 1, else return 0
-addi $sp,$sp,-20
-sw $s0,($sp)
-sw $s1,4($sp)
-sw $s2,8($sp)
-sw $s3,12($sp)
-sw $s4,16($sp)
+    addi $sp,$sp,-12
+    sw $s0,($sp)
+    sw %candidate,4($sp) # store $a0
+    sw %length,8($sp)
 
-la $s0,LIST
-la $s1,LISTSZ
-la $s2,COUNT
-la $s3, HITLIST
-la $s4, HITLISTSZ
 
-addi $sp,$sp,-12
-sw %candidate,($sp) # store $a0
-sw %length,4($sp)
-sw $s3,8($sp) # store $s3
-lw $t5,($s4) # $t5:HITLISTSZ
-lw $t6,(%length) # $t6:length of CANDIDATE
-li $t0,1 # $t0:word iterator in the HITLIST
+    la $s0, Buffer
+    lw $t6,(%length) # $t6:length of CANDIDATE
+    
 L3:
-bgt $t0,$t5,EXIT # if reach the end of HITLIST,break
-lw %candidate,($sp)  # $a0:char iterator in candidate word
-li $t1,0     # $t1:match char counter in a word
-move $t2,$s3 # $t2:char iterator in a word
+bgt $s0,$v0,EXIT # if reach the end of HITLIST,break
+lw %candidate,4($sp)  # $a0:char iterator in candidate word
+move $t2,$s0 # $t2:char iterator in a word
+    li $t1,0
 L4:
 lb $t3,($t2) 
 lb $t4,(%candidate)
 bne $t3,$t4,NEXT #if char not match, check the next entry in the HITLIST
-beq $t1,$t6,REPEAT #if all chars match, break, print error message
+  beq $t1,$t6,REPEAT #if all chars match, break, print error message
 addi $t1,$t1,1
 addi $t2,$t2,1
 addi %candidate,%candidate,1
 j L4
 NEXT:
-addi $s3,$s3,8
-addi $t0,$t0,1
+addi $s0,$s0,8
 j L3
 REPEAT:
 print_str ("\nInvalid Guess!\n")
@@ -202,18 +190,10 @@ j nonrepeat
 EXIT:
 li $v0,1
 nonrepeat:
-lw %candidate,($sp)  
-lw %length,4($sp)
-lw $s3,8($sp)
-addi $sp,$sp,12
-
-
 lw $s0,($sp)
-lw $s1,4($sp)
-lw $s2,8($sp)
-lw $s3,12($sp)
-lw $s4,16($sp)
-addi $sp,$sp,20
+lw %candidate,4($sp)  
+lw %length,8($sp)
+addi $sp,$sp,12
 .end_macro
 ####################################################################################################################
 .macro search(%candidate,%length)  #search the candidate in answer list, if guess correct return 1, else return 0
