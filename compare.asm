@@ -63,6 +63,7 @@
 	print_str("\n")
 
 	li $t0,2
+	
 	L0OP:
 	print_str("The remaining words of length-")
 	print_int($t0)
@@ -79,6 +80,7 @@
 	.end_macro
 ################################################################################
 	.macro summary(%a)  #read from ArrayOfString and make a answer list
+	
 	addi $sp,$sp,-4
 	sw %a,($sp)
 	li $t3,0
@@ -94,12 +96,15 @@
 	addi $t0,$t0,1
 	addi $t1,$t1,1
 	j L2
+	
 	MOVE:
 	addi $t3,$t3,8 # move to the next word of the LIST
+	
 	# LIST_SIZE ++
 	lw $t1,LISTSZ
 	addi $t1,$t1,1
 	sw $t1,LISTSZ
+	
 	# COUNT[length]++
 	sub $t1,$t0,%a
 	subi $t1,$t1,2
@@ -107,8 +112,8 @@
 	lw $t2,COUNT($t1)
 	addi $t2,$t2,1
 	sw $t2,COUNT($t1)
-	# move to the next word in the ArrayOfString
 	
+	# move to the next word in the ArrayOfString
 	addi %a,$t0,1
 	#if reach EOF, END L1
 	lb $t1,($t0)
@@ -172,7 +177,7 @@
 	sw   $t2, RECORD($t1)
 	sw   $t3, RECORD+4($t1)
 	
-	# record size
+	# update record size
 	sw   $t0,RECORDSZ 
 	
 	nonrepeat:
@@ -238,21 +243,25 @@
 	lw $t3, LIST+4($t0) 
 	sw $t2, LIST($t1)
 	sw $t3, LIST+4($t1)
+	
 #  LISTSZ --
 	lw $t0,LISTSZ
 	addi $t0,$t0,-1
 	sw $t0,LISTSZ
+	
 #   HITLISTSZ ++
 	lw $t0, HITLISTSZ
 	addi $t0,$t0,1
 	sw $t0, HITLISTSZ
+	
 # COUNT[length]--
 	subi $t0,$s1,2
 	sll $t0,$t0,2
 	lw $t1,COUNT($t0)
 	addi $t1,$t1,-1
 	sw $t1,COUNT($t0)
-	
+
+# print the score board
 	print_str("\nYou got one point!\n\n")
 	display()
 	li $v0,1
