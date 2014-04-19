@@ -126,11 +126,11 @@
 ########################################################################################################################
 	.macro  check(%candidate,%length) # check if the user has made a repeated guess, if non-repeated return 1, else return 0
 
-    addi $sp,$sp,-16
-    sw %candidate,($sp) # store $a0
-    sw %length, 4($sp)
-    sw $s0, 8($sp)
-    sw $s1, 12($sp)
+    	addi $sp,$sp,-16
+    	sw %candidate,($sp) # store $a0
+    	sw %length, 4($sp)
+    	sw $s0, 8($sp)
+    	sw $s1, 12($sp)
     	
 	lw $s0,	RECORDSZ # $s0:record SZ
 	lw $s1,	(%length) # $s1:length of CANDIDATE
