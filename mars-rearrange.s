@@ -1,12 +1,13 @@
-
-.include "./Kai_macro.asm"
+.include "./Kai_macro.asm" #We will include Kai's MIPS code in order to match the users' input with the legal words
 
 .data
-.align	2
+.align	2 
 
-.globl	exchangeFunc		# This word used to store the address of the exchange method 
-				#and the function to selecr substring to compare
+.globl	exchangeFunc		# This function is used to compare the users' input and the legal words
+
 .data
+#below is the layout of comparison when uesr inputs we would make 7 words as the range of space
+
 exchangeFunc:
 	.word	markTwo
 numChars:
@@ -15,8 +16,11 @@ buffer:
 	.space	16
 compareBuffer:
 	.space	16
+	
 
 .text
+
+#below is the input of our program
 
 read_char:
 	li	$v0, 12
