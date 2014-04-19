@@ -86,19 +86,19 @@
 	li $t3,0
 	
 	L1:
-	move $t0,%a  # $t0:iterator of char in a word; $a0:iterator of ArrayOfString
-	move $t1,$t3  # $s1: list address
+	move $t0,%a  # $t0:iterator of char in a word; %a:address of ArrayOfString
+	move $t1,$t3  # $t1: word index of LIST
 	L2:
 	lb $t2,($t0) 
-	beq $t2,$zero,MOVE #if str[i]='\0' ,EXIT L2
-	beq $t2,44,MOVE #if str[i]=','; EXIT L2
-	sb $t2,LIST($t1)  #store char in LIST[k]
+	beq $t2,$zero,MOVE 	#if str[i]='\0' ,EXIT L2
+	beq $t2,44,MOVE 	#if str[i]=','; EXIT L2
+	sb $t2,LIST($t1)  	#store char in LIST[k]
 	addi $t0,$t0,1
 	addi $t1,$t1,1
 	j L2
 	
 	MOVE:
-	addi $t3,$t3,8 # move to the next word of the LIST
+	addi $t3,$t3,8 		# move to the next word of the LIST
 	
 	# LIST_SIZE ++
 	lw $t1,LISTSZ
@@ -137,22 +137,22 @@
     	sw $s0, 8($sp)
     	sw $s1, 12($sp)
     	
-	lw $s0,	RECORDSZ # $s0:record SZ
-	lw $s1,	(%length) # $s1:length of CANDIDATE
-	li $t0,1 # $t0:entry iterator in the record
+	lw $s0,	RECORDSZ 	# $s0:record SZ
+	lw $s1,	(%length) 	# $s1:length of CANDIDATE
+	li $t0,1 		# $t0:index of word in the record
 	
 	L3:
-	bgt $t0, $s0, EXIT # if reach the end of record,break
-	lw  %candidate,($sp)  # $a0:char iterator in candidate word
+	bgt $t0, $s0, EXIT 	# if reach the end of record,break
+	lw  %candidate,($sp)  	# %candidate: char iterator in candidate word
 	addi $t1,$t0,-1
 	sll $t1,$t1,3	
-	move $t2, $t1   # $t2:char iterator in a word
-	li   $t3, 0     # $t2:match char counter in a word	
+	move $t2, $t1   	# $t2:word index in RECORD
+	li   $t3, 0     	# $t3:match char counter in a word	
 	L4:
 	lb $t4, RECORD($t2)
 	lb $t5, (%candidate)
-	bne $t4,$t5,NEXT    #if char not match, check the next entry in the HITLIST
-	beq $t3,$s1,REPEAT  #if all chars match, break, print error message
+	bne $t4,$t5,NEXT    	#if char not match, check the next entry in the HITLIST
+	beq $t3,$s1,REPEAT  	#if all chars match, break, print error message
 	addi $t2,$t2,1
 	addi $t3,$t3,1
 	addi %candidate,%candidate,1
@@ -164,7 +164,7 @@
 	REPEAT:
 	print_str ("\nInvalid Guess!\n")
 	repeat_sound()
-	li $v0,0 # if the user makes an invalid guess, return 0
+	li $v0,0 		# if the user makes an invalid guess, return 0
 	j nonrepeat
 	
 	EXIT:
@@ -181,7 +181,7 @@
 	sw   $t0,RECORDSZ 
 	
 	nonrepeat:
-	lw %candidate,($sp) # store $a0
+	lw %candidate,($sp) 
 	lw %length,4($sp)
 	lw $s0, 8($sp)
     	lw $s1, 12($sp)
@@ -199,22 +199,22 @@
     	sw $s0, 8($sp)
     	sw $s1, 12($sp)
 
-	li $t0,1 #  $t0:word iterator in the list
-	lw $s0, LISTSZ # $s0:LISTSZ
-	lw $s1, (%length) # $s1:length of CANDIDATE
+	li $t0,1 		# $t0:word iterator in the list
+	lw $s0, LISTSZ 		# $s0:LISTSZ
+	lw $s1, (%length) 	# $s1:length of CANDIDATE
 	
 	L5:
-	bgt $t0,$s0,QUIT # if reach the end of LIST,break
-	lw %candidate,($sp) # $a0:char iterator in candidate word
+	bgt $t0,$s0,QUIT 	# if reach the end of LIST,break
+	lw %candidate,($sp) 	# %candidate:char iterator in candidate word
 	addi $t1,$t0,-1
 	sll $t1,$t1,3	
 	move $t2, $t1 
-	li $t3,0 # $t3:match alphabet counter
+	li $t3,0 		# $t3:match char counter
 	L6:
 	lb $t4, LIST($t2)
 	lb $t5,(%candidate)
-	bne $t4,$t5,CHECK_NEXT # if char does not match, break L6 and move to the next word 
-	beq $t3,$s1,STORE # if all chars match, break L5 and store the word in HITLIST
+	bne $t4,$t5,CHECK_NEXT 	# if char does not match, break L6 and move to the next word 
+	beq $t3,$s1,STORE 	# if all chars match, break L5 and store the word in HITLIST
 	addi $t2,$t2,1
 	addi $t3,$t3,1
 	addi %candidate,%candidate,1
@@ -281,7 +281,7 @@
 	
 ################################################################3
 
-#main:
+	main:
 
 # receive ArrayOfString and generate LIST of all possible answers
 	la $a0,ArrayOfString
