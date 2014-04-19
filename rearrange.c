@@ -80,11 +80,11 @@ int markTwo(int* mark, int input) {
      int ret = exchange(*mark, tmpMark);
      //clearInput(mark);
      *mark = -1;
-/*
+
      if(0 == ret) {
 	 INFO("Invalid input for exchanging\n");
      }
-     */
+     
     return 0;
 }
 
@@ -103,7 +103,6 @@ int markInsert(int* mark, int input) {
 	return 0;
     }
 
-    char tmp;
     int i;
     if(*mark < tmpMark) {
 	for (i = *mark; i < tmpMark - 1; i++) {
@@ -122,7 +121,7 @@ int markInsert(int* mark, int input) {
 
 ExchangeMethod exchangeFunc = markTwo;
 
-int chooseExchangeMethod(int method) {
+int chooseExchangeMethod() {
 
     printf("Select the method:\n");
     printf("1 to markTwo\n");
@@ -152,7 +151,7 @@ int chooseExchangeMethod(int method) {
     return 0;
 }
 
-int rearrange(char* str, int n) {
+int rearrange(int n) {
     //printf("This is a line need to be erased\n");
     //printf("This is the second line");
 	//printf("%c[2K", 27);
@@ -160,7 +159,6 @@ int rearrange(char* str, int n) {
 	//printf("After overwritting\n");	
 	//printf("%s\n",str);	
 
-    int cmd = -1;
     int mark = -1;
     
     /*
@@ -212,7 +210,7 @@ int rearrange(char* str, int n) {
 	    printf("newline");
 	    break;
 	case (int)'m': /*choose exchange method*/
-	    chooseExchangeMethod(0);
+	    chooseExchangeMethod();
 	    break;
 	case (int)'x': /*exit*/
 	    return 0;
@@ -227,7 +225,7 @@ int rearrange(char* str, int n) {
     return 0;
 }
 
-/*
+
 int main(int argc, char** argv) {
 	if(argc < 2) {
 		ERROR("Input format: ./rearrange {WORD}\n");	
@@ -238,11 +236,11 @@ int main(int argc, char** argv) {
 	numChars = n;
 	strncpy(buffer, str, n);
 
-	rearrange(str,n);	
+	rearrange(n);	
 
 	return 0;
 }
-*/
+
 
 
 
