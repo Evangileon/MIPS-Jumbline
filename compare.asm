@@ -86,8 +86,8 @@
 	li $t3,0
 	
 	L1:
-	move $t0,%a  # $t0:iterator of char in a word; %a:address of ArrayOfString
-	move $t1,$t3  # $t1: word index of LIST
+	move $t0,%a  		# $t0:iterator of char in a word; %a:address of ArrayOfString
+	move $t1,$t3  		# $t1: word index of LIST
 	L2:
 	lb $t2,($t0) 
 	beq $t2,$zero,MOVE 	#if str[i]='\0' ,EXIT L2
@@ -133,7 +133,7 @@
 	.macro  check(%candidate,%length) # check if the user has made a repeated guess, if non-repeated return 1, else return 0
 
     	addi $sp,$sp,-16
-    	sw %candidate,($sp) # store $a0
+    	sw %candidate,($sp) 	
     	sw %length, 4($sp)
     	sw $s0, 8($sp)
     	sw $s1, 12($sp)
