@@ -115,9 +115,10 @@
 	
 	# move to the next word in the ArrayOfString
 	addi %a,$t0,1
-	#if reach EOF, END L1
+
 	lb $t1,($t0)
-	beq $t1,$zero,END 
+	beq $t1,$zero,END    	# if reach EOF, end L1 
+	
 	j L1
 	
 	END:
