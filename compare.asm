@@ -179,7 +179,7 @@
 	lw %candidate,($sp) # store $a0
 	lw %length,4($sp)
 	lw $s0, 8($sp)
-    lw $s1, 12($sp)
+    	lw $s1, 12($sp)
 	addi $sp, $sp, 16
 	
 	.end_macro
@@ -190,9 +190,9 @@
 	
 	addi $sp,$sp,-16
 	sw %candidate,($sp) 
-    sw %length, 4($sp)
-    sw $s0, 8($sp)
-    sw $s1, 12($sp)
+    	sw %length, 4($sp)
+    	sw $s0, 8($sp)
+    	sw $s1, 12($sp)
 
 	li $t0,1 #  $t0:word iterator in the list
 	lw $s0, LISTSZ # $s0:LISTSZ
