@@ -227,9 +227,12 @@
 # store the word in HITLIST	
 	STORE: 
 	correct_sound()		
-	lw %candidate,($sp)
-	lw $t2, (%candidate)
-	lw $t3, 4(%candidate)
+
+	addi  $t1,$t0,-1
+	sll   $t1,$t1,3
+	lw  $t2, LIST($t1)
+	lw  $t3, LIST+4($t1)
+	
 	lw $t1, HITLISTSZ
 	sll $t1,$t1,3
 	sw $t2, HITLIST($t1)
